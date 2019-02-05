@@ -1,480 +1,550 @@
-# 4. 다양한 연관관계 처리
-- 객체 간 연관관계 설정
-- 단방향, 양방향 관계의 이해
-- JPQL을 이용한 @Query 처리와 Fetch JOIN(스프링 부트 2.0.0)
-
-## 1. 연관관계 처리의 순서와 사전 설계
-1. 필요한 각각 클래스를 정의
-2. 각 클래스의 연관관계에 대한 설정을 추가
-   1. '일대일', '다대다'등의 연관관계 설정
-   2. 단방향, 양방향 설정
-3. 데이터베이스상에 원하는 형태의 테이블이 만들어지는지를 확인
-4. 테스트 코드를 통해서 정상적으로 동작하는지를 확인
-
-### 관계형 데이터베이스의 설계와 JPA
-1. 가장 중심이 되는 사람이나 명사를 결정하고, 이에 대한 구조를 대략적으로 설계
-2. 생성된 데이터들이 상호 작용을 하면서 만들어내는 새로운 데이터를 정의
-3. 다시 세분화해서 설계
-
-#### 중심이 되는 데이터 결정
-가장 중심이 되는 데이터는 **아무 사전 조건 없는 순수한 데이터**
-- 순수한 장부의 형태로 존재
-- 중심이 되는 데이터는 독립적인 라이프사이클을 유지
-- 고객의 요구사항에서 항상 모든 행위의 주어나 목적어가 됨
-
-#### 중심 데이터 간의 상호 작용
-'동사'에는 주로 중심이 되는 데이터들의 **동작과 히스토리**가 기록됨
-
-#### 연관관계의 설정
-##### 전통적인 관계형 데이터베이스
-**ERD(Entity Relation Diagram)**
-- 일대일(One To One 1:1)
-- 일대다(One To Many 1:N)
-- 다대다(Many To Many M:N)
-
-##### JPA에서의 연관관계
-- 일대일(@OneToOne)
-- 일대다(@OneToMany)
-- 다대일(@ManyToOne)
-- 다대다(@ManyToMany)
-
-JPA를 이용하는 경우 '방향'에 대한 설정이 필요
-- 단방향(Unidirectional) 참조: 한쪽의 클래스만이 다른 클래스의 인스턴스를 참조하도록 설정
-- 양방항(Bidirectional) 참조: 양쪽 클래스 모두 다른 클래스의 인스턴스를 참조
-
-### 작성하려는 예제의 개요
-- 회원과 프로필 사진들의 관계(일대다, 다대일, 단방향)
-- 자료실과 첨부 파일의 관계(일대다, 다대일, 단방향)
-- 게시물과 댓글의 관계(일대다, 다대일, 양방향)
-
-동일한 관계의 예를 3번이나 드는 이유는 **참조에 대한 방향성** 문제
-
-## 2. 회원과 프로필 사진의 관계 - 단방형 처리 1
-### 예제 프로젝트 생성
-Spring Data JPA를 이용한 개발 순서
-- 각 엔티티 클래스의 설계
-- 각 엔티티 간의 연관관계 파악 및 설정
-- 단방향, 양방향 결정
-
-##### Optional<T>
-**Optional**을 가장 쉽게 이해하는 방식은 '`null`을 대신한다'라고 생각  
-**Optional**은 말그대로 존재할 수도 있고, 안 할 수도 있다는 의미  
-과거에는 코드를 통해서 결과 데이터에 `null` 값이 나오는지 직접 일일히 체크했어야 했지만  
-**Optional**을 이용하면 `null`에 대해서 신경쓰지 않고 코드를 작성할 수 있음
-
-**Optional**을 이용할 때에는 주로 `get()` 이나 `isPresent()`를 이용하는데  
-이를 통해서 결과를 반환받거나 결과를 어떤 식으로 처리할 것인지를 지정하게 됨
-
-
-**MySQL**의 경우 데이터베이스의 엔진을 **MyISAM**과 **InnoDB**로 구분  
-**MyISAM** 예전 **MySQL**부터 사용되던 엔진으로 속도면에서 좀 더 나을 수 있지만  
-데이터 무결성을 제대로 체크 히지 않으므로 **InnoDB**를 권장
-
-`spring.jpa.database-platform`를 지정하지 않으면 기본적으로 **MyISAM**로 지정됨
-**InnoDB**를 사용하기 위해서는 `org.hibernate.dialect.MySQL5InnoDBDialect`를 명시적으로 지정함
-**InnoDB**로 지정하지 앟는 경우에는 외래키 대신에 인덱스가 생성되므로 주의해야함
-
-### 각각의 엔티티 클래스 설계
-**Member** 와 **Profile** 클래스 생성
-
-##### GenerationType.AUTO와 GenerationType.INDENTITY
-엔티티의 식별키를 처리하는 여러 방식(전략)중에서 `GenerationType.AUTO`는  
-데이터베이스에 맞게 자동으로 식별키를 처리하는 방식으로 동작
-
-**AUTO**로 지정하면 `hibernate_sequence`라는 테이블을 생성하고 변호를 유지함  
-`hibernate_sequence` 테이블은 자동으로 생성되는 모든 엔티티들이 공유하는 테이블
-
-### 연관관계의 설정과 단방향/양방향
-#### JPA의 연관관계 어노테이션 처리
-Profile과 Member은 다대일 이므로 Profile 쪽 Member에 `@ManyToOne` 어노테이션 설정
-
-#### 생성된 테이블 구조의 확인
-연관관계를 맺은 후 프로젝트를 실행해서 올바른 구조로 생성되는지를 중간중간 확인
-
-### Repository 작성
-MemberRepository 와 ProfileRepository 생성
-
-### 테스트를 통한 검증
-- `@Log`: Lombok의 로그를 사용할 때 이용하는 어노테이션
-- `@Commit`: 테스트 결과를 데이터베이스에 commit하는 용도로 사용
-
-#### 특정 회원의 프로필 데이터 처리
-
-### 단방향의 문제와 Fetch Join
-**'회원 정보를 조회하면서 회원의 현재 프로필 사진도 같이 보여주어야 한다'**와 같은 복합적인 요구사항 처리를 위해  
-JPA에서는 'Fetch Join'이라는 기법을 통해서 SQL에서 조인을 처리하는 것과 유사한 작업을 처리  
-'Fetch Join'은 SQL과 달리 **JPQL**을 이용해서 처리
-
-#### JPA의 Join 처리
-`@Query`에서 사용하는 **JPQL**는 클래스를 보고 작성 하기 때문에 참조 관계가 없는 다른 엔티티 사용하는 것이 불가능 하지만
-스프링 부트 2.0이상에서는 Hibernate 5.2.x에서는 참조 관계가 없어도 **'ON'** 구문을 이용해서 **LEFT OUTER JOIN**을 처리 할 수 있음
-
-**"uid가 'user1'인 회원의 정보와 더불어 회원의 프로필 사진 숫자를 알고 싶다"** 라는 요구사항 처리 
-
-SQL로 처리시
-```sql
-SELECT member.uid, count(fname)
-FROM
-  tbl_members member LEFT OUTER JOIN tbl_profile profile
-  ON profile.member_uid = member.uid
-WHERE member.uid = 'user1'
-group by member.uid
+# Thymeleaf 사용해 보기
+#### application.properties 설정
+템플릿 페이지를 수정하고 브라우저에서 별도의 서버 재시작 없이 바로 확인 가능
+```properties
+# Thymeleaf 캐싱 사용안함
+spring.thymeleaf.cache=false
 ```
 
-`@Query`를 이용해서 처리시
+## 2. Thymeleaf 동작 확인하기
+##### SampleController
 ```java
-public interface MemberRepository extends CrudRepository<Member, String> {
+@Controller
+public class SampleController {
 
-    @Query("SELECT m.uid, count(p) FROM Member m LEFT OUTER JOIN Profile p ON m.uid = p.member WHERE m.uid = ?1 GROUP BY m")
-    List<Object[]> getMemberWithProfileCount(String uid);
+    @GetMapping("/sample1")
+    public void sample1(Model model) {
+        // model.addAttribute("greeting", "Hello World");
+        model.addAttribute("greeting", "안녕하세요");
+    }
 }
 ```
 
+##### sample1.html
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thymeleaf3</title>
+</head>
+<body>
+    <h1 th:text="${greeting}">Thymeleaf Test Page</h1>
+</body>
+</html>
+```
+
+## 3. Thymeleaf 간단한 예제 몇 가지
+- 객체를 화면에 출력하기
+- 리스트를 화면에 출력하기
+- 변수나 제어문 처리
+- request의 파라미터들을 사용하기
+- 레이아웃 처리
+
+### 객체를 화면에 출력하기
+##### sample2 Controller
 ```java
-@Test
-public void FETCH_JOIN_테스트1() {
-    List<Object[]> result = memberRepo.getMemberWithProfileCount("user1");
-    result.forEach(arr -> System.out.println(Arrays.toString(arr)));
+@GetMapping("/sample2")
+public void sample2(Model model) {
+    MemberVO vo = new MemberVO(123, "u00", "p00", "홍길동", new Timestamp(System.currentTimeMillis()));
+    model.addAttribute("vo", vo);
 }
 ```
 
-메소드 리턴 타입은 `List<Object[]>`로 처리됨  
-**JPQL**에서는 엔티티 타입 뿐 아니라 다른 자료형들도 반환할 수 있기 때문에  
-**List**는 결과의 Row 수를 의미  
-**Object[]**는 칼럼들을 의미
-
-**'회원 정보와 현재 사용 중인 프로필에 대한 정보'**를 얻고자하는 **JPQL**
-```java
-@Query("SELECT m, p FROM Member m LEFT OUTER JOIN Profile p ON m.uid = p.member WHERE m.uid = ?1 AND p.current = true")
-List<Object[]> getMemberWithProfile(String uid);
+##### sample2.html
+```html
+<h1 th:text="${vo}">Thymeleaf Test Page</h1>
 ```
 
-```java
-@Test
-public void FETCH_JOIN_테스트2() {
-    List<Object[]> result = memberRepo.getMemberWithProfile("user1");
-    result.forEach(arr -> System.out.println(Arrays.toString(arr)));
-}
+#### HTML 출력하기 - utext
+`th:text`와 달리 `th:utext`는 문자열이 아니라 HTML 자체를 출력
+```html
+<div th:utext='${"<h3>"+vo.mid+"</h3>"}'></div>
+<div th:text='${"<h3>"+vo.mid+"</h3>"}'></div>
 ```
 
-> Hibernate 5.0 이하에서는 반드시 참조를 해주어야만 함
-
-## 3. 자료실과 첨부 파일의 관계 - 단방향 2
-**Member**에서 **Profile**에 대한 참조를 이용하고 **Profile**에서는 참조를 하지 않는 설계 역시 가능
-이 경우 `@JoinTable`이라는 설정을 이용
-
-### 엔티티 클래스 작성
-**PDSFile** 클래스는 자료에 첨부된 파일을 의미하므로 파일의 이름만 저장
-
-#### 연관관계 설정
-단방향 연관관계를 설정하고 프로젝트를 실행했을 때  
-**tbl_pds**와 **tbl_pdsfile**은 엔티티 클래스 작성 시에 지정했지만 **tbl_pds_files**는 자동으로 생성된 테이블임
-
-단방향 `@OneToMany`에서 별도의 테이블이 생성되는 것이 싫다면 별도의 테이블 없이 특정한 테이블을 조인할 것이라고  
-명시하거나(`@JoinTable`), `@JoinColumn`을 명시해 기존 테입ㄹ을 이용해서 조인한다고 표현해 주어야 함
-
-- `@JoinTable`: 자동으로 생성되는 테이블 대신에 별도의 이름을 가진 테이블을 생성하고자 할 때 사용
-- `@JoinColumn`: 이미 존재하는 테이블에 칼럼을 추가할 때 사용
-
+### 리스트를 화면에 출력하기
+화면에서 가장 많이 사용하는 루프 처리는 `th:each`를 이용해서 처리
+`java.util.Iterable`, `Java.util.Map`, 배열등 사용가능
+##### sample3 Controller
 ```java
-@OneToMany
-@JoinColumn(name="pdsno")
-private List<PDSFile> files;
-```
-```java
-@ToString(exclude = "files")
-```
+@GetMapping("/sample3")
+public void sample3(Model model) {
 
-`@JoinColumn`을 이용해 변경하고 `@ToString`을 변경 하면
-**tbl_pdsfiles** 테이블에 **pdsno**라는 이름의 칼럼이 추가 됨
-
-#### 연관관계에 따른 Repository
-JPA에서 처리하려는 엔티티 객체의 상태에 따라서 종속적인 객체들의 영속성도 같이 처리 되는 것을 **'영속성 전이'**라고 한다  
-**영속성 전이**는 부모 엔티티나 자식 엔티티의 상태 변화가 자신과 관련 있는 엔티티에 영향을 주는 것을 의미
-
-JPA 종속적인 엔티티의 영속성 전이에 대한 설정
-- ALL: 모든 변경에 대해 전이
-- PERSIST: 저장 시에만 전이
-- MERGE: 병합 시에만 전이
-- REMOVE: 삭제 시에만 전이
-- REFRESH: 엔티티 매니저의 refresh() 호출 시 전이
-- DETACH: 부모 엔티티가 detach되면 자식 엔티티 역시 detach
-
-ALL을 사용하려면 **PDSBoard**에 `@OneToMay` 속성에 cascade 속성을 다음과 같이 지정
-```java
-@OneToMany(cascade= CascadeType.ALL)
-@JoinColumn(name="pdsno")
-private List<PDSFile> files;
-```
-
-### 첨부 파일 수정과 @Modifying, @Transactional
-`@Query`는 기본적으로 'select' 구문만을 지원  
-`@Modifying`을 이용해서 DML(insert, update, delete) 작업을 처리
-```java
-public interface PDSBoardRepository extends CrudRepository<PDSBoard, Long> {
-
-    @Modifying
-    @Query("UPDATE FROM PDSFile f set f.pdsfile = ?2 WHERE f.fno = ?1 ")
-    int updatePDSFile(Long fno, String newFileName);
-}
-```
-
-`@Query`를 이용해서 '`update`', '`delete`'를 사용하는 경우에는 반드시 `@Transactional` 처리를 필요로 함
-```java
-@Transactional
-@Test
-public void 첨부파일_이름_수정(){
-    Long fno = 1L;
-    String newName = "updatedFile1.doc";
-
-    int count = repo.updatePDSFile(fno, newName);
-    // @Log 설정된 이후 사용 가능
-    log.info("update count: " + count);
-}
-```
-
-테스트에서 `@Transactional`이 기본적으로 롤백 처리를 시도  
-`@Commit`을 추가해서 자동으로 commit 처리
-
-#### 순수 객체를 통한 파일 수정
-전통적인 방식으로 처리
-```java
-@Transactional
-@Test
-public void 첨부파일_이름_수정2(){
-    String newName = "updatedFile2.doc";
-    // 반드시 번호가 존재하는지 확인할 것
-    Optional<PDSBoard> result = repo.findById(2L);
-
-    result.ifPresent(pds -> {
-        log.info("데이터가 존재하므로 update 시도");
-        PDSFile target = new PDSFile();
-        target.setFno(2L);
-        target.setPdsfile(newName);
-
-        //fno 값으로 equals()와 hashcode() 사용
-        int idx = pds.getFiles().indexOf(target);
-
-        if(idx > -1){
-            List<PDSFile> list = pds.getFiles();
-            list.remove(idx);
-            list.add(target);
-            pds.setFiles(list);
-        }
-        repo.save(pds);
+    List<MemberVO> list = new ArrayList<>();
+    IntStream.range(0, 10).forEach(i -> {
+        list.add(new MemberVO(123, "u0"+i, "p0"+i, "홍길동"+i, new Timestamp(System.currentTimeMillis())));
     });
+    model.addAttribute("list", list);
 }
 ```
 
-### 첨부 파일 삭제
-```java
-@Modifying
-@Query("DELETE FROM PDSFile f WHERE f.fno = ?1")
-int deletePDSFile(Long fno);
+##### sample3.html
+`#dates.format()`은 Thymeleaf의 보조 객체로 날짜와 관련된 처리에 유용하게 사용됨
+```html
+<table border="1">
+    <tr>
+        <td>MID</td>
+        <td>MNAME</td>
+        <td>REGDATE</td>
+    </tr>
+    <tr th:each="member : ${list}">
+        <td th:text="${member.mid}"></td>
+        <td th:text="${member.mname}">Doe</td>
+        <td th:text="${#dates.format(member.regdate, 'yyyy-MM-dd')}"></td>
+    </tr>
+</table>
 ```
 
-### 조인 처리
-**자료와 첨부 파일의 수를 자료 번호의 역순으로 출력**
-```java
-@Query("SELECT p, count(f) FROM PDSBoard p LEFT OUTER JOIN p.files f ON p.pid = f WHERE p.pid > 0 GROUP BY p ORDER BY p.pid DESC ")
-List<Object[]> getSummary();
+`th:each`사용시 사용할 수 있는 추가 항목
+- index: 0부터 시작하는 인덱스 번호
+- count: 1부터 시작하는 번호
+- size: 현재 대상의 length 혹은 size
+- odd/even: 현재 번호의 홀수/짝수 여부
+- first/last: 처음 요소인지 마지막 요소인지를 판단
+```html
+<table border="1">
+    <tr>
+        <td>INDEX</td>
+        <td>COUNT</td>
+        <td>SIZE</td>
+        <td>ODD/EVEN</td>
+        <td>FIRST/LAST</td>
+        <td>MID</td>
+        <td>MNAME</td>
+        <td>REGDATE</td>
+    </tr>
+    <tr th:each="member, iterState : ${list}">
+        <td th:text="${iterState.index}"></td>
+        <td th:text="${iterState.count}"></td>
+        <td th:text="${iterState.size}"></td>
+        <td th:text="${'홀수: '+iterState.odd + ' 짝수: ' + iterState.even}"></td>
+        <td th:text="${'처음: '+iterState.first + ' 마지막: ' + iterState.last}"></td>
+        <td th:text="${member.mid}"></td>
+        <td th:text="${member.mname}">Doe</td>
+        <td th:text="${#dates.format(member.regdate, 'yyyy-MM-dd')}"></td>
+    </tr>
+</table>
 ```
 
-```java
-@Test
-public void 자료와첨부_파일의수_자료번호의_역순출력() {
-    repo.getSummary().forEach(arr -> log.info(Arrays.toString(arr)));
-}
-```
+### 지역변수의 선언 if~unless 제어 처리
+특정한 범위에서만 유효한 지역변수를 `th:with`를 이용해서 선언할 수 있음
 
-## 4. 게시물과 댓글의 관계 - 양방향
-### 연관관계의 설정
-FreeBoard 클래스는 '일대다'관계이므로 `@OneToMany`  
+##### sample4 Controller
 ```java
-@OneToMany
-private List<FreeBoardReply> replies;
-```
-FreeBoardReply는 '다대일'의 관계이므로 `@ManyToOne`
-```java
-@ManyToOne
-private FreeBoard board;
-```
+@GetMapping("/sample4")
+public void sample4(Model model) {
 
-양쪽 테이블 중간에 지정하지 않은 테이블 하나가 생성되는 이유는 `@OneToMany` 때문  
-`@OneToMany` 관계를 저장하려면 중간에 '다(Many)'에 해당하는 정보를 보관하기 위해서 JPA의 구현체는 별도의 테이블을 생성함
-
-#### mappedBy 속성
-JPA에서는 관계를 설정할 때 **PK** 쪽이 `mappedBy`라는 속성을 이용해서 자신이 다른 객체에게 '매여있다'는 것을 명시하게 됨  
-'해당 엔티티가 관계의 주체가 되지 않는다는 것을 명시한다'고 한다
-```java
-@OneToMany(mappedBy = "board")
-private List<FreeBoardReply> replies;
-```
-
-#### 양방향 설정과 toString()
-양방향 참조를 사용하는 경우에는 반드시 한쪽은 `toString()`에서 참조하는 객체를 출력하지 않도록 수정해주어야 함  
-**Lombok**의 **@ToString**에는 `exclude` 속성을 이용해 특정 인스턴스 변수를 `toString()`에서 제외
-```java
-@ToString(exclude = "replies")
-```
-```java
-@ToString(exclude = "board")
-```
-
-#### Repository 작성
-각 엔티티가 별도의 라이프사이클을 가진다면 별도의 **Repository**를 생성하는 것이 좋음
-
-**FreeBoard** 와 **FreeBoardReply** **Repository** 각각 생성
-```java
-public interface FreeBoardRepository extends CrudRepository<FreeBoard, Long> {
-}
-```
-```java
-public interface FreeBoardReplyRepository extends CrudRepository<FreeBoardReply, Long> {
-}
-```
-
-#### 테스트 코드
-게시물에 댓글을 추가하는 방식
-- 단방향에서 처리하듯이 **FreeBoardReply**를 생성하고 **FreeBoard** 자체는 새로 만들어서 bno 속성만을 지정하여 처리하는 방식
-- 양방향이므로 **FreeBoard** 객체를 얻어온 후 **FreeBoardReply**를 댓글 리스트에 추가한 후에 **FreeBoard** 자체를 저장하는 방식
-```java
-@Transactional
-@Test
-public void 양방향_댓글등록() {
-    Optional<FreeBoard> result = boardRepo.findById(200L);
-    result.ifPresent(board -> {
-        List<FreeBoardReply> replies = board.getReplies();
-        FreeBoardReply reply = FreeBoardReply.builder()
-                .reply("REPLY................")
-                .replayer("replyer00")
-                .board(board)
-                .build();
-        replies.add(reply);
-        board.setReplies(replies);
-        boardRepo.save(board);
+    List<MemberVO> list = new ArrayList<>();
+    IntStream.range(0, 10).forEach(i -> {
+        list.add(new MemberVO(i, "u000"+i%3, "p0000"+i%3, "홍길동"+i, new Timestamp(System.currentTimeMillis())));
     });
+    model.addAttribute("list", list);
+}
+```
+target는 `table` 내에서만 유효한 지역 변수
+```html
+<table border="1" th:with="target='u0001'">
+    <tr>
+        <td>MID</td>
+        <td>MNAME</td>
+        <td>REGDATE</td>
+    </tr>
+    <tr th:each="member : ${list}">
+        <td th:text="${member.mid == target ? 'SECRET': member.mid}">Doe</td>
+        <td th:text="${member.mname}"></td>
+        <td th:text="${#dates.format(member.regdate, 'yyyy-MM-dd')}"></td>
+    </tr>
+</table>
+```
+
+##### if~else 처리
+##### sample4.html
+```html
+<table border="1" th:with="target='u0001'">
+    <tr>
+        <td>MID</td>
+        <td>MNAME</td>
+        <td>REGDATE</td>
+    </tr>
+    <tr th:each="member : ${list}">
+        <td th:if="${member.mid}">
+            <a href="/modify" th:if="${member.mid == target}">MODIFY</a>
+            <p th:unless="${member.mid == target}">VIEW</p>
+        </td>
+        <td th:text="${member.mname}"></td>
+        <td th:text="${#dates.format(member.regdate, 'yyyy-MM-dd')}"></td>
+    </tr>
+</table>
+```
+
+### 인라인 스타일로 Thymeleaf 사용하기
+인라인 가능한 영역에 `th:inline='text'` 추가
+##### sample5 Controller
+```java
+@GetMapping("/sample5")
+public void sample5(Model model){
+    String result = "SUCCESS";
+    model.addAttribute("result", result);
 }
 ```
 
-##### 1. 게시물이 저장될 때 댓글이 같이 저장되도록 cascading 처리가 되어야 함
-```java
-@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-private List<FreeBoardReply> replies;
+##### sample5.html
+```html
+<script th:inline="javascript">
+    var result = [[${result}]]
+</script>
+<script>
+    var result = [[${result}]]
+</script>
 ```
 
-##### 2. 댓글 쪽에도 변경이 있기 때문에 트랜잭션을 처리해 주어야 함
+##### sample6 Controller
 ```java
-@Transactional
-@Test
-```
-
-#### 단방향 방식의 댓글 추가
-```java
-@Test
-public void 단방향_댓글등록() {
-    FreeBoard board = new FreeBoard();
-    board.setBno(199L);
-
-    FreeBoardReply reply = FreeBoardReply.builder()
-            .reply("REPLY................")
-            .replayer("replyer00")
-            .board(board)
-            .build();
-    replyRepo.save(reply);
-}
-```
-
-### 게시물의 페이징 처리와 @Query
-- 쿼리 메소드를 이용하는 경우의 '게시물 + 댓글의 수'
-- `@Query`를 이용하는 경우의 '게시물 + 댓글의 수'
-
-#### 쿼리 메소드를 이용하는 경우
-페이징 처리를 하기 위해서 tbl_freeboards만을 이용
-```java
-public interface FreeBoardRepository extends CrudRepository<FreeBoard, Long> {
-    List<FreeBoard> findByBnoGreaterThan(Long bno, Pageable page);
-}
-```
-```java
-@Test
-public void 쿼리메소드_게시물페이징() {
-    Pageable page = PageRequest.of(0, 10, Sort.Direction.DESC, "bno");
-    boardRepo.findByBnoGreaterThan(0L, page).forEach(board -> {
-        log.info(board.getBno() +": "+board.getTitle());
+@GetMapping("/sample6")
+public void sample6(Model model) {
+    List<MemberVO> list = new ArrayList<>();
+    IntStream.range(0, 10).forEach(i -> {
+        list.add(new MemberVO(i, "u0"+i, "p0"+i, "홍길동"+i, new Timestamp(System.currentTimeMillis())));
     });
+    model.addAttribute("list", list);
 
+    String result = "SUCCESS";
+    model.addAttribute("result", result);
 }
 ```
 
-#### 지연로딩(lazy loading)
-JPA는 연관관계가 있는 엔티티를 조회할 때 기본적으로 **'지연 로딩(lazy loading)'**이라는 방식을 이용  
-정보가 필요하기 전까지는 최대한 테이블에 접근하지 않는 방식을 의미  
-
-지연 로딩을 하는 가장 큰 이유는 성능  
-JPA에서는 연관관계의 **Collection** 타입을 처리할 때 **'지연 로딩'**을 기본으로 사용
-
-**지연 로딩**의 반대 개념은 **'즉시 로딩(eager loading)'**  
-**즉시 로딩**은 일반적으로 조인을 이용해서 필요한 모든 정보를 처리하게 됨  
-**즉시 로딩**을 사용하려면 `@OneToMany`에 'fetch'라는 속성값으로 `FetchType.EAGER`를 지정하면 됨
-```java
-@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-private List<FreeBoardReply> replies;
-```
-성능에 영향을 줄 수 있는 **즉시 로딩**을 이용하는 것은 주의할 필요가 있음  
-**지연 로딩**과 **즉시 로딩**을 사용할 때에는 반드시 해당 작업을 위해서 어떠한 SQL들이 실행되는지를 체크 해야 함
-
-**지연 로딩**을 이용하면서 댓글을 같이 가져오고 싶다면 `@Transactional`을 이용해서 처리
-```java
-@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-private List<FreeBoardReply> replies;
+##### sample6.html
+```html
+<table border="1" th:inline="text">
+    <tr>
+        <td>MID</td>
+        <td>MNAME</td>
+        <td>REGDATE</td>
+    </tr>
+    <tr th:each="member : ${list}">
+        <td>[[${member.mid}]]</td>
+        <td>[[${member.mname}]]</td>
+        <td>[[${member.regdate}]]</td>
+    </tr>
+</table>
+<script th:inline="javascript">
+    var result = [[${result}]];
+</script>
 ```
 
-```java
-@Transactional
-@Test
+## 4. Thymeleaf의 유틸리티 객체
+- **Expression Basic Objects(표현식 기본 객체)**
+  - #ctx
+  - #vars
+  - #locale
+  - #httpServletRequest
+  - #httpSession
+- **Expression Utility Objects(표현식 유틸 객체)**
+  - #dates
+  - #calendars
+  - #numbers
+  - #strings
+  - #objects
+  - #bools
+  - #arrays
+  - #lists
+  - #sets
+  - #maps
+  - #aggregates
+  - #messages
+
+`#vars`의 경우 생략한 상태로 주로 사용됨
+```html
+<div>[[${result}]]</div>
+<div>[[${#vars.result}]]</div>
 ```
 
-#### @Query와 Fetch Join을 이용한 처리
-**지연 로딩**의 문제를 해결하는 가장 좋은 방법은 `@Query`를 이용해서 조인 처리를 하는 것
-
-`@Query`를 이용해서 엔티티의 일부 속성이나 다른 엔티티의 조회할 때의 리턴 타입은 **`컬렉션<배열>`**의 형태가 됨  
-이 경우 `List<Object[]>`에서 **List**는 결과 데이터의 '행(row)'을 의미하고 **Object[]**는 '열(column)'을 의미
-
-**FreeBoard**에 **replies**가 **지연 로딩**으로 처리되어 있는지 확인  
-기본 옵션이 **지연 로딩**이므로 삭제해도 무방
+### 유틸리티 객체
+Thymeleaf의 표현식은 OGNL(Object-Graph Navigation Language) 표현식을 이용해서 데이터를 출력
+##### sample7 Controller
 ```java
-@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-private List<FreeBoardReply> replies;
-```
-
-```java
-@Query("SELECT b.bno, b.title, count(r) FROM FreeBoard b LEFT OUTER JOIN b.replies r WHERE b.bno > 0 GROUP BY b")
-List<Object[]> getPage(Pageable page);
-```
-
-```java
-@Test
-public void Query와_FETCH_JOIN처리() {
-    Pageable page = PageRequest.of(0, 10, Sort.Direction.DESC, "bno");
-    boardRepo.getPage(page).forEach(arr -> {
-        log.info(Arrays.toString(arr));
-    });
+@GetMapping("/sample7")
+public void sample7(Model model) {
+    model.addAttribute("now", new Date());
+    model.addAttribute("price", 123456789);
+    model.addAttribute("title", "This is a just sample");
+    model.addAttribute("options", Arrays.asList("AAAA","BBB","CCC","DDD"));
 }
 ```
 
-### 게시물 조회와 인덱스
-**지연 로딩**은 필요할 때까지 댓글 관련 데이터를 로딩하지 않기 때문에 성능면에서 장점을 가지고 있음  
-한 번에 게시물과 댓글의 내용을 같이 보여주는 상황이라면 SQL이 한번에 처리되지 않기 때문에 여러 번 데이터 베이스를 호출하는 문제  
+##### sample7.html
+```html
+<h1 th:text="${now}"></h1>
+<h1 th:text="${price}"></h1>
+<h1 th:text="${title}"></h1>
+<h1 th:text="${options}"></h1>
+```
 
-해결책은 **지연 로딩**을 그대로 이용하고 댓글 쪽에는 필요한 순간에 데이터가 좀 더 빨리 나올 수 있도록 신경 쓰는 방식
+#### 날짜 관련 #dates, #calendars
+날짜 관련 기능은 `java.util.Date`와 `java.util.Calendar`의 기능을 이용한다고 생각하면 됨
+```html
+<h2 th:text="${#dates.format(now, 'yyyy-MM-dd')}"></h2>
+<div th:with="timeValue=${#dates.createToday()}">
+    <p>[[${timeValue}]]</p>
+</div>
+```
 
-#### 인덱스 처리
-댓글 목록의 경우는 특정한 게시물 번호에 영향을 받기 때문에 게시물 번호에 대한 인덱스를 생성해 두면 데이터가 많을 때 성능의 향상을 기대할 수 있음
+#### 숫자 관련 #numbers
+Integer나 Double, Float에 대한 포매팅을 처리할 때 주로 사용  
+수소점의 경우 formatInteger를 이용하면 정수 처리가 되기 때문에 주의해서 사용
+```html
+<h2 th:text="${#numbers.formatInteger(price,3,'COMMA')}"></h2>
+<div th:with="priceValue=99.87654">
+    <p th:text="${#numbers.formatInteger(priceValue,3,'COMMA')}"></p>
+    <p th:text="${#numbers.formatDecimal(priceValue,5,10,'POINT')}"></p>
+</div>
+```
 
-`@Table`에는 인덱스를 설계할 때 `@Index`와 같이 사용해서 테이블 생성 시에 인덱스가 설계되도록 지정할 수 있음
+#### 문자 관련 #strings
+문자열과 관련해서는 대소문자 변환이나 `contains()`등 기본적인 기능들 외에 문자열을 결합하는 `join`이나  
+리스트로 나누는 `listsplit`등의 기능들이 지원됨
+```html
+<h1 th:text="${title}"></h1>
+<span th:utext="${#strings.replace(title,'s','<b>s</b>')}"></span>
+<ul>
+    <li th:each="str:${#strings.listSplit(title,' ')}">[[${str}]]</li>
+</ul>
+```
+
+## 5. Thymeleaf 링크 처리
+일반적인 웹 페이지의 링크는 'http://www...'와 같은 형태의 절대(absolute path)경로와  
+현재 URL을 기준으로 이동하는 상대(context-relative) 경로 두가지로 구분됨
+
+WAS상에서 특정 경로에서 프로젝트가 실행되는 경우에 문제가 될 수 있음
+
+Thymeleaf는 이러한 문제 해결을 위해 `@{}`을 이용해 경로에 대한 처리를 자동으로 처리
+##### sample8 Controller
 ```java
-@Table(name = "tbl_free_replies", indexes = {@Index(unique = false, columnList = "board_bno")})
-@EqualsAndHashCode(of = "rno")
-public class FreeBoardReply {
+@GetMapping("/sample8")
+public void sample8(Model model) {
+    
+}
+```
+
+##### sample8.html
+```html
+<ul>
+    <!-- 절대 경로 처리 http://localhost:8080/sample1 -->
+    <li><a th:href="@{http://localhost:8080/sample1}">sample1</a></li>
+    <!-- 컨텍스트 경로 처리 /boot05/sample1 -->
+    <li><a th:href="@{/sample1}">sample1</a></li>
+    <!-- 현재 프로젝트 경로 /sample1 -->
+    <li><a th:href="@{~/sample1}">sample1</a></li>
+    <!-- 파라메터 전달 -->
+    <li><a th:href="@{/sample1(p1='aaa', p2='bbb')}">sample1</a></li>
+</ul>
+```
+
+## 6. Thymeleaf의 레이아웃 기능
+`th:replace`, `th:include`와 같은 속성들을 이용해서 기존 페이지의 일부분을 다른 내용으로 쉽게 변경할 수 있음
+
+Thymeleaf는 부분적인 화면 처리 기능과 더불어 화면 전체의 레이아웃을 지정하고  
+페이지를 작성할 때 필요한 부분만을 교체해서 사용하는 템플릿 기능이 지원됨
+##### header.html
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <div th:fragment="header">
+        헤더 파일입니다
+    </div>
+</html>
+```
+
+##### footer.html
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <div th:fragment="footer">
+        Footer 파일입니다
+    </div>
+</html>
+```
+
+##### sample8.html
+```html
+<div th:insert="~{fragments/header::header}"></div>
+<div>
+    <ul>
+        <!-- 절대 경로 처리 http://localhost:8080/sample1 -->
+        <li><a th:href="@{http://localhost:8080/sample1}">sample1</a></li>
+        <!-- 컨텍스트 경로 처리 /boot05/sample1 -->
+        <li><a th:href="@{/sample1}">sample1</a></li>
+        <!-- 현재 프로젝트 경로 /sample1 -->
+        <li><a th:href="@{~/sample1}">sample1</a></li>
+        <!-- 파라메터 전달 -->
+        <li><a th:href="@{/sample1(p1='aaa', p2='bbb')}">sample1</a></li>
+    </ul>
+</div>
+<div th:insert="~{fragments/footer::footer}"></div>
+```
+
+### Thymeleaf layout dialect를 이용한 레이아웃 재사용하기
+**Thymeleaf layout dialect**를 이용하면 하나의 레이아웃을 작성하고 이를 재사용해서 여러 페이지에 동일한 레이아웃을 적용시킬 수 있음  
+**템플릿 상속**이라고 부르기도 함
+##### 의존성 추가
+```xml
+<dependency>
+    <groupId>nz.net.ultraq.thymeleaf</groupId>
+    <artifactId>thymeleaf-layout-dialect</artifactId>
+    <version>2.3.0</version>
+</dependency>
+```
+
+상속 기능 적용을 위해 **HTML5 Boilerplate** 적용  
+**HTML5 Boilerplate**는 웹 페이지에서 가장 기본적으로 필요한 구조를 템플릿으로 만들어 둔 것
+
+https://html5boilerplate.com/
+
+다운로드하여 `static` 디렉토리에 붙여넣고 **index.html** 내용을 **'layout/layout1.html'**에 붙여 넣기
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+    <![endif]-->
+
+
+    <!-- content body -->
+    <div>
+
+    </div>
+
+    <script src="js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.3.1.min.js"><\/script>')</script>
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- custom javascript -->
+    <script></script>
+
+    <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+    <script>
+        window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+        ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
+    </script>
+    <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+</body>
+</html>
+```
+
+#### th:block과 layout:fragment
+매번 페이지 제작 시 변경되는 영역은 **'content-body'**와 **'custom javascript'** 영역
+
+`layout:fragment`는 `<div>` 와 같이 실제로 보이는 영역에 적용  
+`th:block`은 아무런 태그가 없는 영역을 표시할 때 사용
+
+아래와 같이 변경
+```html
+<!-- content body -->
+<div layout:fragment="content">
+
+</div>
+
+<!-- custom javascript -->
+<th:block layout:fragment="script"></th:block>
+```
+
+##### sample/hello.html
+```html
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout/layout1}">
+
+    <header layout:fragment="header">
+        <h1>Header</h1>
+    </header>
+    <div layout:fragment="content">
+        <h1>Hello Page</h1>
+    </div>
+    <footer layout:fragment="footer">
+        <h1>Footer</h1>
+    </footer>
+
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            console.log("Java Script Block!!!")
+        </script>
+    </th:block>
+</html>
+```
+
+##### layout/layout1.html `th:href` 로 링크 경로 수정
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="manifest" href="site.webmanifest">
+        <link rel="apple-touch-icon" href="icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <link rel="stylesheet" th:href="@{/css/normalize.css}">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
+        <script th:src="@{/js/vendor/modernizr-3.6.0.min.js}"></script>
+    </head>
+
+    <body>
+        <!--[if lte IE 9]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+        <![endif]-->
+
+        <header layout:fragment="header">
+            <h1>My website</h1>
+        </header>
+        <!-- content body -->
+        <div layout:fragment="content">
+            <p>Page content goes here</p>
+        </div>
+        <footer layout:fragment="footer">
+            <h1>My Footer</h1>
+        </footer>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script>window.jQuery || document.write('<script th:src="@{/js/vendor/jquery-3.3.1.min.js}"><\/script>')</script>
+        <script th:src="@{/js/plugins.js}"></script>
+        <script th:src="@{/js/main.js}"></script>
+
+        <!-- custom javascript -->
+        <th:block layout:fragment="script"></th:block>
+
+        <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+        <script>
+            window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+            ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
+        </script>
+        <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+    </body>
+
+</html>
 ```
