@@ -29,3 +29,8 @@ https://getbootstrap.com/docs/3.4/getting-started/
 ### Querydsl 설정
 ### 테스트 코드 작성
 #### 더미 데이터 추가
+
+## 2. 페이징, 검색 처리
+### Repository 페이징 테스트
+`QuerydslPredicateExecutor`의 `findAll()`은  
+`Predicate`타입과 파라미터와 `Pageable`를 파라미터로 전달 받을 수 있음
