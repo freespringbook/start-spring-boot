@@ -14,6 +14,7 @@
 
         <link rel="stylesheet" th:href="@{/css/normalize.css}">
         <link rel="stylesheet" th:href="@{/css/main.css}">
+
         <script th:src="@{/js/vendor/modernizr-3.6.0.min.js}"></script>
     </head>
 
@@ -22,21 +23,29 @@
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
 
-        <header layout:fragment="header">
-            <h1>My website</h1>
-        </header>
-        <!-- content body -->
-        <div layout:fragment="content">
-            <p>Page content goes here</p>
+        <div class="page-header">
+            <h1>
+                Project <small>for Spring MVC + JPA</small>
+            </h1>
         </div>
-        <footer layout:fragment="footer">
-            <h1>My Footer</h1>
-        </footer>
+
+        <div class="panel panel-default" layout:fragment="content">
+            <div class="panel-body">Web Board List Page</div>
+        </div>
 
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script>window.jQuery || document.write('<script th:src="@{/js/vendor/jquery-3.3.1.min.js}"><\/script>')</script>
         <script th:src="@{/js/plugins.js}"></script>
         <script th:src="@{/js/main.js}"></script>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap-theme.min.css" integrity="sha384-jzngWsPS6op3fgRCDTESqrEJwRKck+CILhJVO5VvaAZCq8JYf8HsR/HPpBOOPZfR" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js" integrity="sha384-vhJnz1OVIdLktyixHY4Uk3OHEwdQqPppqYR8+5mjsauETgLOcEynD9oPHhhz18Nw" crossorigin="anonymous"></script>
 
         <!-- custom javascript -->
         <th:block layout:fragment="script"></th:block>
