@@ -37,10 +37,21 @@ public class WebBoardRepositoryTest {
     }
 
     @Test
-    public void testList1() {
+    public void 검색조건없는페이징_테스트() {
         Pageable pageable = PageRequest.of(0, 20, Direction.DESC, "bno");
 
         Page<WebBoard> result = repo.findAll(repo.makePredicate(null, null), pageable);
+        log.info("PAGE: " + result.getPageable());
+
+        log.info("----------------------------");
+        result.getContent().forEach(board -> log.info("" + board));
+    }
+
+    @Test
+    public void 검색조건처리_테스트() {
+        Pageable pageable = PageRequest.of(0, 20, Direction.DESC, "bno");
+
+        Page<WebBoard> result = repo.findAll(repo.makePredicate("t", "10"), pageable);
         log.info("PAGE: " + result.getPageable());
 
         log.info("----------------------------");
