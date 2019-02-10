@@ -127,3 +127,68 @@ PageMaker가 처리하는 데이터
     <a class="page-link" href="#">[[${p.pageNumber} + 1 ]]</a>
 </li>
 ```
+
+#### 페이지 이동 처리
+```html
+<ul class="pagination">
+    <li class="page-item" th:if="${result.prevPage}">
+        <a class="page-link" th:href="${result.prevPage.pageNumber} + 1">PREV [[${result.prevPage.pageNumber} + 1 ]]</a>
+    </li>
+    <li class="page-item" th:classappend="${p.pageNumber == result.currentPageNum-1} ? active : '' "
+        th:each="p:${result.pageList}">
+        <a class="page-link" th:href="${p.pageNumber} + 1">[[${p.pageNumber} + 1 ]]</a>
+    </li>
+    <li class="page-item" th:if="${result.nextPage}">
+        <a class="page-link" th:href="${result.nextPage.pageNumber} + 1">NEXT [[${result.nextPage.pageNumber} + 1 ]]</a>
+    </li>
+</ul>
+```
+
+##### 페이지 이동을 위한 Javascript 처리
+페이지 이동을 위한 form 추가
+```html
+<form id="f1" th:action="@{list}" method="get">
+    <input type="hidden" name="page" th:value="${result.currentPageNum}">
+    <input type="hidden" name="size" th:value="${result.currentPage.pageSize}">
+</form>
+```
+
+페이지 이동을 위한 Javascript 추가
+```html
+<th:block layout:fragment="script">
+
+    <script th:inline="javascript">
+        $(function () {
+            var formObj = $("#f1");
+            $(".pagination a").click(function (e) {
+                e.preventDefault();
+                formObj.find('[name="page"]').val($(this).attr('href'));
+                formObj.submit();
+            })
+        });
+    </script>
+
+</th:block>
+```
+
+리스트 HTML
+```html
+<table class="table table-striped table-bordered table-hover" id="dataTables-example">
+    <thead>
+        <tr>
+            <th>BNO</th>
+            <th>TITLE</th>
+            <th>WRITER</th>
+            <th>REGDATE</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="odd gradeX" th:each="board:${result.content}">
+            <td>[[${board.bno}]]</td>
+            <td><a th:href='${board.bno}' class='boardLink'>[[${board.title}]]</a></td>
+            <td>[[${board.writer}]]</td>
+            <td class="center">[[${#dates.format(board.regdate, 'yyyy-MM-dd')}]]</td>
+        </tr>
+    </tbody>
+</table>
+```
