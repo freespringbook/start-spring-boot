@@ -118,3 +118,12 @@ PageMaker가 처리하는 데이터
     </div>
 </nav>
 ```
+
+##### 현재 페이지 번호 구분하기
+현재 페이지 번호를 구분하기 위해 **Thymeleaf**의 `th:classappend`를 적용해서 특별한 경우에만 특정 CSS의 클래스를 추가
+```html
+<li class="page-item" th:classappend="${p.pageNumber == result.currentPageNum-1} ? active : '' "
+    th:each="p:${result.pageList}">
+    <a class="page-link" href="#">[[${p.pageNumber} + 1 ]]</a>
+</li>
+```
