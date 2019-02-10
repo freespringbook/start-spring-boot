@@ -277,3 +277,7 @@ $(".boardLink").click(function(e){
 				formObj.submit();
 			});
 ```
+
+### 컨트롤러의 처리
+- 게시물 조회 **'/boards/view'** 추가: 전달되는 데이터는 '게시물의 번호' + '검색 조건' + '페이징 조건'
+- /boards/view.html 추가

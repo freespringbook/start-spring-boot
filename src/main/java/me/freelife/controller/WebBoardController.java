@@ -40,6 +40,12 @@ public class WebBoardController {
         return "redirect:/boards/list";
     }
 
+    @GetMapping("/view")
+    public void view(Long bno, @ModelAttribute("pageVO") PageVO vo, Model model){
+        log.info("BNO: "+ bno);
+        repo.findById(bno).ifPresent(board -> model.addAttribute("vo", board));
+    }
+
     @GetMapping("/list")
     public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
         Pageable page = vo.makePageable(0, "bno");
