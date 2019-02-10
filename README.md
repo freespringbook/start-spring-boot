@@ -192,3 +192,47 @@ PageMaker가 처리하는 데이터
     </tbody>
 </table>
 ```
+
+### 검색 조건의 처리
+**PageVO**에 **'keyword(검색 키워드)'**와 **'type(검색 타입)'**을 수집할 수 있도록 수정
+
+#### list.html에서의 검색 처리
+검색 처리 추가
+```html
+<div>
+    <select id='searchType'>
+        <option>--</option>
+        <option value='t' th:selected="${pageVO.type} =='t'" >Title</option>
+        <option value='c' th:selected="${pageVO.type} =='c'">Content</option>
+        <option value='w' th:selected="${pageVO.type} =='w'">Writer</option>
+    </select>
+    <input type='text' id='searchKeyword' th:value="${pageVO.keyword}">
+    <button id='searchBtn'>Search</button>
+</div>
+```
+
+form 변경
+```html
+<form id='f1' th:action="@{list}" method="get">
+    <input type='hidden' name='page' th:value=${result.currentPageNum}>
+    <input type='hidden' name='size' th:value=${result.currentPage.pageSize}>
+    <input type='hidden' name='type' th:value=${pageVO.type}>
+    <input type='hidden' name='keyword' th:value=${pageVO.keyword}>
+</form>
+```
+
+searchBtn 클릭 스크립트 추가
+```javascript
+$("#searchBtn").click(function(e){
+
+    var typeStr = $("#searchType").find(":selected").val();
+    var keywordStr = $("#searchKeyword").val();
+
+    console.log(typeStr, "" , keywordStr);
+
+    formObj.find("[name='type']").val(typeStr);
+    formObj.find("[name='keyword']").val(keywordStr);
+    formObj.find("[name='page']").val("1");
+    formObj.submit();
+});
+```
