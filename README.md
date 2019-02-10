@@ -79,5 +79,42 @@ public Pageable makePageable(int direction, String... props) {
 **Service** 계층 설계 없이 직접 **'Controller -> Repository'**를 연동 처리
 
 ##### 화면상에서 `${result}`로 출력되는 페이지 번호
+https://github.com/spring-projects/spring-data-commons/blob/master/src/main/java/org/springframework/data/domain/PageImpl.java  
 **Pageable** 인터페이스의 구현체인 **PageableImpl** 클래스의 `toString()` 이용 시  
 실제 페이지 번호에 `1`을 더해서 출력하기 때문에 `0`이 아닌 `1`부터 출력됨
+
+#### 화면의 출력과 페이징 처리
+- 화면출력 부트스트랩 List - https://getbootstrap.com/docs/4.2/components/list-group/
+- 페이징 처리 - https://getbootstrap.com/docs/4.2/components/pagination/
+
+##### 페이지 번호 출력
+페이징 처리에는 `Page<WebBoard>`의 `getPageable()`을 이용해서 **Pageable** 타입의 객체를 활용
+
+페이지 번호를 출력하려면 **PageMaker**라는 별도의 클래스를 이용해 페이지 번호 출력에 필요한 정보들을 처리하도록 작성  
+**PageMaker**는 화면에 출력할 결과 `Page<T>`를 생성자로 전달 받고 내부적으로 페이지 계산을 처리  
+
+PageMaker가 처리하는 데이터
+- `prevPage`: 페이지 목록의 맨 앞인 '이전'으로 이동하는 데 필요한 정보를 가진 **Pageable**
+- `nextPage`: 페이지 목록 맨 뒤인 '다음'으로 이동하는 데 필요한 정보를 가진 **Pageable**
+- `currentPage`: 현재 페이지의 정보를 가진 **Pageable**
+- `pageList`: 페이지 번호의 시작부터 끝까지의 **Pageable**들을 저장한 리스트
+- `currentPageNum`: 화면에 보이는 1부터 시작하는 페이지 번호
+
+```html
+<!-- paging -->
+<nav aria-label="Page navication">
+    <div>
+        <ul class="pagination">
+            <li class="page-item" th:if="${result.prevPage}">
+                <a class="page-link" href="#">PREV [[${result.prevPage.pageNumber} + 1 ]]</a>
+            </li>
+            <li class="page-item" th:each="p:${result.pageList}">
+                <a class="page-link" href="#">[[${p.pageNumber} + 1 ]]</a>
+            </li>
+            <li class="page-item" th:if="${result.nextPage}">
+                <a class="page-link" href="#">NEXT [[${result.nextPage.pageNumber} + 1 ]]</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+```

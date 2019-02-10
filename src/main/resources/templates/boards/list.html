@@ -4,12 +4,34 @@
       layout:decorate="~{/layout/layout1}">
     <div layout:fragment="content">
 
-        <div class="panel-heading">List Page</div>
-        <div class="panel-body">
+        <div class="card-header">List Page</div>
+        <div class="card-body">
             <p>[[${result}]]</p>
-            <div>[[${result.content}]]</div>
+            <div th:with="result=${result.result}">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="board:${result.content}">[[${board}]]</li>
+                </ul>
+            </div>
+            <p></p>
+            <!-- paging -->
+            <nav aria-label="Page navication">
+                <div>
+                    <ul class="pagination">
+                        <li class="page-item" th:if="${result.prevPage}">
+                            <a class="page-link" href="#">PREV [[${result.prevPage.pageNumber} + 1 ]]</a>
+                        </li>
+                        <li class="page-item" th:each="p:${result.pageList}">
+                            <a class="page-link" href="#">[[${p.pageNumber} + 1 ]]</a>
+                        </li>
+                        <li class="page-item" th:if="${result.nextPage}">
+                            <a class="page-link" href="#">NEXT [[${result.nextPage.pageNumber} + 1 ]]</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         </div>
     </div>
+    <!-- end fragment -->
 
     <th:block layout:fragment="script">
 

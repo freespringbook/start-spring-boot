@@ -3,6 +3,7 @@ package me.freelife.controller;
 import lombok.extern.java.Log;
 import me.freelife.domain.WebBoard;
 import me.freelife.persistence.WebBoardRepository;
+import me.freelife.vo.PageMaker;
 import me.freelife.vo.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class WebBoardController {
         log.info("" + page);
         log.info("" + result);
 
-        model.addAttribute("result", result);
+        log.info("TOTAL PAGE NUMBER: " + result.getTotalPages());
+        model.addAttribute("result", new PageMaker(result));
     }
 }
