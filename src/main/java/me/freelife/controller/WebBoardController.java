@@ -52,6 +52,24 @@ public class WebBoardController {
         repo.findById(bno).ifPresent(board -> model.addAttribute("vo", board));
     }
 
+    @PostMapping("/delete")
+    public String delete(Long bno, PageVO vo, RedirectAttributes rttr ){
+
+        log.info("DELETE BNO: " + bno);
+
+        repo.deleteById(bno);
+
+        rttr.addFlashAttribute("msg", "success");
+
+        //페이징과 검색했던 결과로 이동하는 경우
+        rttr.addAttribute("page", vo.getPage());
+        rttr.addAttribute("size", vo.getSize());
+        rttr.addAttribute("type", vo.getType());
+        rttr.addAttribute("keyword", vo.getKeyword());
+
+        return "redirect:/boards/list";
+    }
+
     @GetMapping("/list")
     public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
         Pageable page = vo.makePageable(0, "bno");

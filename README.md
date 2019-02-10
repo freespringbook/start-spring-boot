@@ -332,3 +332,21 @@ $(".boardLink").click(function(e){
                   )}" class="btn btn-primary">Cancel & Go List</a>
 </div>
 ```
+
+### 삭제 처리
+수정과 삭제 작업은 POST방식으로 처리
+```javascript
+<script th:inline="javascript">
+    $(function(){
+
+        var formObj = $("#f1");
+
+        $(".delbtn").click(function(){
+            formObj.attr("action","delete");
+            formObj.attr("method", "post");
+
+            formObj.submit();
+        });
+    });
+</script>
+```
