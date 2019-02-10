@@ -304,3 +304,31 @@ $(".boardLink").click(function(e){
                   )}" class="btn btn-primary">Go List</a>
 </div>
 ```
+
+## 5. 게시물의 삭제와 수정
+- 게시물 수정/삭제 페이지 처리
+- 게시물 삭제 및 이동
+- 게시물 수정 및 이동
+
+### 게시물 수정/삭제를 위한 페이지
+- 수정 페이지 이동 컨트롤러 작성 '/boards/modify'
+- /boards/modify.html 작성
+
+수정 등이 작업 후에 다시 원래 사용자가 보던 리스트 페이지로 이동하기 위해  
+`<form>` 태그 내부에 페이징 조건과 검색 조건을 같이 전달할 수 있도록 hidden 태그들로 작성
+
+수정, 삭제, 취소 후 목록 버튼 생성 처리
+```html
+<div class="float-right">
+  <a href="#" class="btn btn-warning modbtn">Modify</a>
+
+  <a href="#" class="btn btn-danger delbtn">Delete</a>
+
+    <a th:href="@{ list(page=${pageVO.page},
+                    size=${pageVO.size},
+                    type=${pageVO.type},
+                    keyword=${pageVO.keyword},
+                    bno = ${vo.bno}
+                  )}" class="btn btn-primary">Cancel & Go List</a>
+</div>
+```
