@@ -74,3 +74,10 @@ public Pageable makePageable(int direction, String... props) {
     return PageRequest.of(this.page - 1, this.size, dir, props);
 }
 ```
+
+#### Repository와의 연동 처리
+**Service** 계층 설계 없이 직접 **'Controller -> Repository'**를 연동 처리
+
+##### 화면상에서 `${result}`로 출력되는 페이지 번호
+**Pageable** 인터페이스의 구현체인 **PageableImpl** 클래스의 `toString()` 이용 시  
+실제 페이지 번호에 `1`을 더해서 출력하기 때문에 `0`이 아닌 `1`부터 출력됨
