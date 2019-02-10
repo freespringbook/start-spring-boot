@@ -36,6 +36,22 @@
                 readonly="readonly" />
         </div>
 
+        <div class="pull-right">
+            <a th:href="@{ modify(page=${pageVO.page},
+                            size=${pageVO.size},
+                            type=${pageVO.type},
+                            keyword=${pageVO.keyword},
+                            bno =${vo.bno}
+                         )}" class="btn btn-default">Modify/Delete</a>
+
+            <a th:href="@{ list(page=${pageVO.page},
+                            size=${pageVO.size},
+                            type=${pageVO.type},
+                            keyword=${pageVO.keyword},
+                            bno = ${vo.bno}
+                         )}" class="btn btn-primary">Go List</a>
+        </div>
+
     </div>
 
 </div>

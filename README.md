@@ -281,3 +281,26 @@ $(".boardLink").click(function(e){
 ### 컨트롤러의 처리
 - 게시물 조회 **'/boards/view'** 추가: 전달되는 데이터는 '게시물의 번호' + '검색 조건' + '페이징 조건'
 - /boards/view.html 추가
+
+### 조회 페이지에서의 링크 처리
+- 수정/삭제 페이지로 이동할 수 있는 링크
+- 다시 게시물 목록(리스트)으로 이동할 수 있는 링크
+
+조회 페이지는 반드시 현재의 '검색 조건 + 페이징 조건'을 이용해서 다시 목록 페이지로 이동할 수 있도록 링크를 작성
+```html
+<div class="pull-right">
+    <a th:href="@{ modify(page=${pageVO.page},
+                    size=${pageVO.size},
+                    type=${pageVO.type},
+                    keyword=${pageVO.keyword},
+                    bno =${vo.bno}
+                  )}" class="btn btn-default">Modify/Delete</a>
+
+    <a th:href="@{ list(page=${pageVO.page},
+                    size=${pageVO.size},
+                    type=${pageVO.type},
+                    keyword=${pageVO.keyword},
+                    bno = ${vo.bno}
+                  )}" class="btn btn-primary">Go List</a>
+</div>
+```
