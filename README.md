@@ -236,3 +236,14 @@ $("#searchBtn").click(function(e){
     formObj.submit();
 });
 ```
+
+## 3. 새로운 게시물 등록
+**WebBoard** 엔티티 클래스를 그대로 이용
+
+### 게시물의 입력과 처리
+`POST - Redirect - GET` 방식으로 여러 번 게시물이 등록되는 것을 방지
+
+**RedirectAttributes**는 URL로는 보이지 않는 문자열을 생성해 주기 때문에 브라우저의 주소창에는 보이지 않음
+- /board/register GET, POST 메소드 추가
+- /boards/register.html 작성
+- /boards/list.html 등록 알림 처리

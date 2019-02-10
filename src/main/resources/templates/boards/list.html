@@ -75,6 +75,16 @@
     <th:block layout:fragment="script">
 
         <script th:inline="javascript">
+
+            $(window).on('load', function(){
+                var msg = [[${msg}]];
+
+                if(msg =='success') {
+                    alert("정상적으로 처리되었습니다.");
+                    var stateObj = { msg: "" };
+                }
+            });
+
             $(function () {
                 var formObj = $("#f1");
 
