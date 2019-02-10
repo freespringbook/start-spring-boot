@@ -335,6 +335,9 @@ $(".boardLink").click(function(e){
 
 ### 삭제 처리
 수정과 삭제 작업은 POST방식으로 처리
+
+- 삭제 POST방식 메소드 추가
+- 삭제 스크립트 추가
 ```javascript
 <script th:inline="javascript">
     $(function(){
@@ -350,3 +353,23 @@ $(".boardLink").click(function(e){
     });
 </script>
 ```
+
+### 수정 처리
+- POST방식으로 호출되는 메소드 추가
+- 수정 스크립트 추가
+```javascript
+<script th:inline="javascript">
+$(function(){
+    var formObj = $("#f1");
+
+    $(".modbtn").click(function(){
+        formObj.attr("action","modify");
+        formObj.attr("method", "post");
+
+        formObj.submit();
+    });
+});
+</script>
+```
+
+수정 작업의 화면 흐름은 **'게시물 조회 -> 수정 화면으로 진입 -> 수정 작업 처리 -> 조회 화면'** 순으로 동작
