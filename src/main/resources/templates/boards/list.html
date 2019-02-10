@@ -20,7 +20,8 @@
                         <li class="page-item" th:if="${result.prevPage}">
                             <a class="page-link" href="#">PREV [[${result.prevPage.pageNumber} + 1 ]]</a>
                         </li>
-                        <li class="page-item" th:each="p:${result.pageList}">
+                        <li class="page-item" th:classappend="${p.pageNumber == result.currentPageNum-1} ? active : '' "
+                            th:each="p:${result.pageList}">
                             <a class="page-link" href="#">[[${p.pageNumber} + 1 ]]</a>
                         </li>
                         <li class="page-item" th:if="${result.nextPage}">
