@@ -247,3 +247,33 @@ $("#searchBtn").click(function(e){
 - /board/register GET, POST 메소드 추가
 - /boards/register.html 작성
 - /boards/list.html 등록 알림 처리
+
+#### 게시물 입력 링크 처리
+```html
+<div class="card-body float-right">
+    <h3><a class="badge badge-primary " th:href="@{register}">Register</a></h3>
+</div>
+```
+
+## 4. 게시물의 조회
+- **검색 조건이 없는 경우의 조회**: 페이지 번호를 유지한 상태에서 조회로 이동
+- **검색 조건이 있는 경우의 조회**: 페이지 번호 + 기타 검색 조건을 모두 유지한 상태에서 이동
+
+이동이 가능한 링크 추가
+```html
+<td><a th:href='${board.bno}' class='boardLink'>[[${board.title}]]</a></td>
+```
+
+이동 스크립트 추가
+```javascript
+$(".boardLink").click(function(e){
+				e.preventDefault(); 
+				
+				var boardNo = $(this).attr("href");
+				
+				formObj.attr("action",[[@{'/boards/view'}]]);
+				formObj.append("<input type='hidden' name='bno' value='" + boardNo +"'>" );
+				
+				formObj.submit();
+			});
+```

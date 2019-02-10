@@ -99,6 +99,17 @@
                     formObj.submit();
                 })
 
+                $(".boardLink").click(function(e){
+                    e.preventDefault();
+
+                    var boardNo = $(this).attr("href");
+
+                    formObj.attr("action",[[@{'/boards/view'}]]);
+                    formObj.append("<input type='hidden' name='bno' value='" + boardNo +"'>" );
+
+                    formObj.submit();
+                });
+
                 $("#searchBtn").click(function(e){
 
                     var typeStr = $("#searchType").find(":selected").val();
