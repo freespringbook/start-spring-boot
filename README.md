@@ -57,3 +57,20 @@ public void list(@PageableDefault(direction = Sort.Direction.DESC, sort = "bno",
     log.info("list() called..." + page);
 }
 ```
+
+#### PageVO를 생성하는 방식
+`@PageableDefault` 단점
+- 페이지 번호가 0부터 시작하기 때문에 일반 사용자들에게는 직관적이지 않음
+- 파라미터를 이용해서 size를 지정할 수 있기 때문에 고의적으로 size 값을 크게 주는 것을 막을 수 없음
+- 기타 정렬 방향이나 속성 역시 모두 브라우저에서 전달되는 값을 통해서 조절할 수 있기 때문에 고의적인 공격에 취약
+
+`@PageableDefault`를 이용하는 방식 보다는 별도로 파라미터를 수집해서 처리하는 **Value Object**를 생성하는 방식이 
+이러한 문제를 조금은 줄여줄 수 있음
+
+내부에서는 페이지 번호가 자동으로 `1`이 감소된 형태로 **Pageable** 타입의 객체를 사용하도록 `-1`하여 리턴
+```java
+public Pageable makePageable(int direction, String... props) {
+    Sort.Direction dir = direction == 0 ? Sort.Direction.DESC : Sort.Direction.ASC;
+    return PageRequest.of(this.page - 1, this.size, dir, props);
+}
+```
