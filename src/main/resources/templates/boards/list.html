@@ -5,6 +5,11 @@
     <div layout:fragment="content">
 
         <div class="card-header">List Page</div>
+
+        <div class="card-body float-right">
+            <h3><a class="badge badge-primary " th:href="@{register}">Register</a></h3>
+        </div>
+
         <div class="card-body">
 
             <div th:with="result=${result.result}">
