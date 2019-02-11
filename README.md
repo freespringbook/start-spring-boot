@@ -50,3 +50,10 @@ private WebBoard board;
 @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
 private List<WebReply> replies;
 ```
+
+#### @JsonIgnore 어노테이션
+양방향의 경우 **JSON** 변환이 상호 호출 되므로 무한히 방복해서 생성하는 문제가 생길 수 있음  
+이 때문에 객체를 **JSON** 형태로 만들 때 제외 시키기 위해 `@JsonIgnore` 어노테이션을 적용
+
+최종적으로 **WebReply** 객체를 변환한 **JSON** 데이터에서는 **WebBoard**와 관련된 내용은 제외됨
+
