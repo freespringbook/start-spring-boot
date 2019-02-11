@@ -1,11 +1,13 @@
 package me.freelife.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter @Setter
 @Builder
@@ -14,7 +16,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "tbl_webboards")
 @EqualsAndHashCode(of = "bno")
-@ToString
+@ToString(exclude = "replies")
 public class WebBoard {
 
     @Id
@@ -30,4 +32,8 @@ public class WebBoard {
     private Timestamp regdate;
     @UpdateTimestamp
     private Timestamp updatedate;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    private List<WebReply> replies;
 }

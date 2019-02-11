@@ -28,4 +28,8 @@ public class WebReply {
     private Timestamp regdate;
     @UpdateTimestamp
     private Timestamp updatedate;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private WebBoard board;
 }

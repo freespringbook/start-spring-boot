@@ -34,3 +34,19 @@ Spring MVC에서 REST 방식의 설계와 사용을 위해서 제공하는 어�
 게시글과 댓글의 관계는 '일대다', '다대일' 이라고 볼 수 있음  
 '양방향'으로 설계하는 방식을 이용
 - WebReply 댓글 엔티티 클래스 작성
+
+### 연관관계의 설정
+**WebReply**에 **WebBoard**를 `@ManyToOne` 관계로 설정
+```java
+@JsonIgnore
+@ManyToOne(fetch = FetchType.LAZY)
+private WebBoard board;
+```
+
+**WebBoard**에는 `@OneToMany` 관계를 설정  
+불필요하게 양쪽 테이블을 조회 하지 않도록 양쪽 모두 '지연 로딩' 방식 설정
+```java
+@JsonIgnore
+@OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+private List<WebReply> replies;
+```
