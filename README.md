@@ -29,3 +29,8 @@ Spring MVC에서 REST 방식의 설계와 사용을 위해서 제공하는 어�
 - `@ResponseBody`: 클라이언트에게 전송되는 데이터에 맞게 **MIME** 타입을 결정
 - `@PathVariable`: URL의 경로에 포함된 정보 추출
 - `@RestController`: 컨트롤러의 모든 메소드 리턴 타입으로 `@ResponseBody`를 기본으로 지정
+
+## 2. JPA의 설계와 Repository의 설계/테스트
+게시글과 댓글의 관계는 '일대다', '다대일' 이라고 볼 수 있음  
+'양방향'으로 설계하는 방식을 이용
+- WebReply 댓글 엔티티 클래스 작성
