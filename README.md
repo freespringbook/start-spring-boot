@@ -57,3 +57,11 @@ private List<WebReply> replies;
 
 최종적으로 **WebReply** 객체를 변환한 **JSON** 데이터에서는 **WebBoard**와 관련된 내용은 제외됨
 
+### ReplyRepository 추가
+**WebReply**는 단독으로 CRUD 작업이 가능하기 때문에 별도의 Repository를 생성
+
+댓글의 내용은 특별히 검색을 처리 하지 않을 것이므로 **QuerydslPredicateExcuter**를 추가하지 않음
+```java
+public interface WebReplyRepository extends CrudRepository<WebReply, Long> {
+}
+```
