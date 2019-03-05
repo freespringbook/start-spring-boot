@@ -141,3 +141,18 @@ public ResponseEntity<Void> addReply(@PathVariable("bno") Long bno, @RequestBody
     return new ResponseEntity<>(HttpStatus.CREATED);
 }
 ```
+
+### REST 방식 테스트
+'Yet Another REST Client(이하 YARC)'라는 도구를 이용해서 작성된 ReplyController를 확인
+'/boards/list' GET 방식 API 호출 테스트 200 응답 확인
+
+#### 댓글 등록 처리 호출
+YARC로 '/replies/303' POST 방식 API 호출 테스트
+
+Payload 테스트 JSON 데이터로 201 응답 확인
+```json
+{
+    "replyText":"샘플 댓글",
+    "replyer":"user00"
+}
+```
