@@ -65,3 +65,37 @@ private List<WebReply> replies;
 public interface WebReplyRepository extends CrudRepository<WebReply, Long> {
 }
 ```
+
+### WebReplyRepository의 테스트
+지정된 게시물의 번호를 이용해서 댓글을 10개씩 추가하는 테스트
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@Log
+@Commit
+public class WebReplyRepositoryTest {
+
+    @Autowired
+    WebReplyRepository repo;
+
+    @Test
+    public void 댓글_더미데이터_생성() {
+        Long[] arr = {302L, 301L, 296L};
+
+        Arrays.stream(arr).forEach(num ->{
+
+            WebBoard board = new WebBoard();
+            board.setBno(num);
+
+            IntStream.range(0, 10).forEach(i -> {
+
+                WebReply reply = new WebReply();
+                reply.setReplyText("REPLY ..." + i);
+                reply.setReplyer("replyer" + i);
+                reply.setBoard(board);
+
+                repo.save(reply);
+            });
+        });
+    }
+}
