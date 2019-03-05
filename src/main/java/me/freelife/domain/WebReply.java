@@ -9,8 +9,9 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
 @Builder
+@NoArgsConstructor @AllArgsConstructor
+@Entity
 @Table(name = "tbl_webreplies")
 @EqualsAndHashCode(of = "rno")
 @ToString(exclude = "board")
