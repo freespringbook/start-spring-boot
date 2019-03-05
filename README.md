@@ -111,7 +111,7 @@ REST 방식에서 자원은 보통 복수형을 사용하므로 '/replies'를 �
 | 특정 게시물의 댓글 수정 | PUT      | /replies/게시물 번호           |
 | 특정 게시물의 모든 댓글 | GET      | /replies/게시물 번호           |
 
-### WebReplyController.java 추가
+##### WebReplyController.java 추가
 ```java
 @RestController
 @RequestMapping("/replies")
@@ -120,5 +120,24 @@ public class WebReplyController {
     @Autowired // setter를 만들어서 처리하는 것이 정석이지만..
     private WebReplyRepository replyRepo;
 
+}
+```
+
+### 특정 게시물의 댓글 등록 처리
+- `@PathVariable`: URI의 일부를 파라미터로 받기 위해서 사용하는 어노테이션
+- `@RequestBody`: JSON으로 전달되는 데이터를 객체로 자동으로 변환하도록 처리하는 역할
+
+리턴타입은 `ReponseEntity`를 이용
+`ResponseEntity`: 코드를 이용해서 직접 Http Response의 상태 코드와 데이터를 직접 제어해서 처리할 수 있음
+
+addReply()에서는 우선적으로 HTTP의 상태 코드 중에 201을 의미하는 'created'라는 메시지를 전송하도록 함
+```java
+@PostMapping("/{bno}")
+public ResponseEntity<Void> addReply(@PathVariable("bno") Long bno, @RequestBody WebReply reply){
+    log.info("addReply.............................");
+    log.info("BNO: " + bno);
+    log.info("REPLY: " + reply);
+
+    return new ResponseEntity<>(HttpStatus.CREATED);
 }
 ```
