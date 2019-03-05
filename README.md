@@ -99,3 +99,26 @@ public class WebReplyRepositoryTest {
         });
     }
 }
+```
+
+## 3. ReplyController의 설계
+REST 방식에서 자원은 보통 복수형을 사용하므로 '/replies'를 이용하는 형태로 시작
+
+| 기능                    | 전송방식 | URI 예                         |
+| ----------------------- | -------- | ------------------------------ |
+| 특정 게시물의 댓글 추가 | POST     | /replies/게시물 번호           |
+| 특정 게시물의 댓글 삭제 | DELETE   | /replies/게시물 번호/댓글 번호 |
+| 특정 게시물의 댓글 수정 | PUT      | /replies/게시물 번호           |
+| 특정 게시물의 모든 댓글 | GET      | /replies/게시물 번호           |
+
+### WebReplyController.java 추가
+```java
+@RestController
+@RequestMapping("/replies")
+public class WebReplyController {
+
+    @Autowired // setter를 만들어서 처리하는 것이 정석이지만..
+    private WebReplyRepository replyRepo;
+
+}
+```
