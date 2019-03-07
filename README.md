@@ -260,3 +260,19 @@ PUT - http://localhost:8080/replies/1
     "replyer":"replyer1"
 }
 ```
+
+### 댓글 목록
+댓글 목록은 GET 방식으로 처리하고 게시물의 번호를 이용
+
+## 4. 화면에서의 댓글 처리
+JavaScript로 하나의 객체를 생성해서 처리하는 '모듈 패턴'을 이용
+
+- static/js 폴더 내에 reply.js 파일을 작성
+
+replyManager는 즉시 실행 함수로 구성되어 있고 단 한 번만 실행됨
+리턴은 '키'와 '메소드'로 이루어진 객체를 반환하게 됨
+
+- view.html 수정
+
+서버 구동 후 테스트
+http://localhost:8080/boards/view?page=1&size=10&type=&keyword=&bno=301
