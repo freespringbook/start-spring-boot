@@ -196,6 +196,15 @@ private List<WebReply> getListByBoard(WebBoard board) throws RuntimeException{
 }
 ```
 
+테스트
+```
+POST - http://localhost:8080/replies/1
+{
+    "replyText":"댓글 추가",
+    "replyer":"replyer1"
+}
+```
+
 **addReply()**는 WebRepository에 **save()** 작업과 **findBoard...()**를 연속해서 호출하기 때문에 `@Transactional` 처리를 함
 
 나중에 게시물의 댓글의 목록이 필요할 수 있으므로 **getListByBoard()**라는 메소드로 분리
@@ -214,5 +223,40 @@ public ResponseEntity<List<WebReply>> remove(@PathVariable("bno")Long bno, @Path
     board.setBno(bno);
 
     return new ResponseEntity<>(getListByBoard(board), HttpStatus.OK);
+}
+```
+
+테스트
+```
+DELTE - http://localhost:8080/replies/1/1
+```
+
+### 댓글 수정
+댓글 수정 처리는 PUT 방식을 이용해서 처리
+```java
+@Transactional
+@PutMapping("/{bno}")
+public ResponseEntity<List<WebReply>> modify(@PathVariable("bno")Long bno, @RequestBody WebReply reply){
+    log.info("modify reply: "+ reply);
+
+    replyRepo.findById(reply.getRno()).ifPresent(origin -> {
+        origin.setReplyText(reply.getReplyText());
+        replyRepo.save(origin);
+    });
+
+    WebBoard board = new WebBoard();
+    board.setBno(bno);
+
+    return new ResponseEntity<>(getListByBoard(board), HttpStatus.CREATED);
+}
+```
+
+테스트
+```
+PUT - http://localhost:8080/replies/1
+{
+    "rno": 65,
+    "replyText":"리플 수정",
+    "replyer":"replyer1"
 }
 ```
