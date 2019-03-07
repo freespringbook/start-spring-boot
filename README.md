@@ -199,3 +199,20 @@ private List<WebReply> getListByBoard(WebBoard board) throws RuntimeException{
 **addReply()**는 WebRepository에 **save()** 작업과 **findBoard...()**를 연속해서 호출하기 때문에 `@Transactional` 처리를 함
 
 나중에 게시물의 댓글의 목록이 필요할 수 있으므로 **getListByBoard()**라는 메소드로 분리
+
+### 댓글 삭제
+댓글이 삭제된 후에는 다시 해당 게시물의 모든 댓글을 갱신하기 위해 댓글의 번호와 게시물의 번호가 같이 필요
+```java
+@Transactional
+@DeleteMapping("/{bno}/{rno}")
+public ResponseEntity<List<WebReply>> remove(@PathVariable("bno")Long bno, @PathVariable("rno")Long rno){
+    log.info("delete reply: "+ rno);
+
+    replyRepo.deleteById(rno);
+
+    WebBoard board = new WebBoard();
+    board.setBno(bno);
+
+    return new ResponseEntity<>(getListByBoard(board), HttpStatus.OK);
+}
+```
