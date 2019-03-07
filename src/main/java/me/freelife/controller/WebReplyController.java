@@ -20,6 +20,15 @@ public class WebReplyController {
     @Autowired // setter를 만들어서 처리하는 것이 정석이지만..
     private WebReplyRepository replyRepo;
 
+    @GetMapping("/{bno}")
+    public ResponseEntity<List<WebReply>> getReplies(@PathVariable("bno")Long bno){
+        log.info("get All Replies..........................");
+
+        WebBoard board = new WebBoard();
+        board.setBno(bno);
+        return ResponseEntity.ok(getListByBoard(board));
+    }
+
     @Transactional
     @PostMapping("/{bno}")
     public ResponseEntity<List<WebReply>> addReply(@PathVariable("bno") Long bno, @RequestBody WebReply reply){
@@ -34,7 +43,7 @@ public class WebReplyController {
         reply.setBoard(board);
         replyRepo.save(reply);
 
-        return new ResponseEntity<>(getListByBoard(board), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(getListByBoard(board));
     }
 
     private List<WebReply> getListByBoard(WebBoard board) throws RuntimeException{
@@ -52,7 +61,7 @@ public class WebReplyController {
         WebBoard board = new WebBoard();
         board.setBno(bno);
 
-        return new ResponseEntity<>(getListByBoard(board), HttpStatus.OK);
+        return ResponseEntity.ok(getListByBoard(board));
     }
 
     @Transactional
@@ -68,6 +77,6 @@ public class WebReplyController {
         WebBoard board = new WebBoard();
         board.setBno(bno);
 
-        return new ResponseEntity<>(getListByBoard(board), HttpStatus.CREATED);
+        return ResponseEntity.ok(getListByBoard(board));
     }
 }
