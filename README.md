@@ -156,3 +156,46 @@ Payload 테스트 JSON 데이터로 201 응답 확인
     "replyer":"user00"
 }
 ```
+
+### 댓글 등록 후 목록 처리
+WebReplyRepository 인터페이스에 댓글 리스트를 처리하기 위한 메소드를 설계
+```java
+public interface WebReplyRepository extends CrudRepository<WebReply, Long> {
+
+    @Query("SELECT r FROM WebReply r WHERE r.board = ?1 AND r.rno > 0 ORDER BY r.rno ASC")
+    List<WebReply> getRepliesOfBoard(WebBoard board);
+
+}
+```
+
+WebReplyController에서는 getRepliesOfBoard()를 호출
+```java
+@Autowired // setter를 만들어서 처리하는 것이 정석이지만..
+private WebReplyRepository replyRepo;
+
+@Transactional
+@PostMapping("/{bno}")
+public ResponseEntity<List<WebReply>> addReply(@PathVariable("bno") Long bno, @RequestBody WebReply reply){
+
+    log.info("addReply.............................");
+    log.info("BNO: " + bno);
+    log.info("REPLY: " + reply);
+
+    WebBoard board = new WebBoard();
+    board.setBno(bno);
+
+    reply.setBoard(board);
+    replyRepo.save(reply);
+
+    return new ResponseEntity<>(getListByBoard(board), HttpStatus.CREATED);
+}
+
+private List<WebReply> getListByBoard(WebBoard board) throws RuntimeException{
+    log.info("getListByBoard...."+ board);
+    return replyRepo.getRepliesOfBoard(board);
+}
+```
+
+**addReply()**는 WebRepository에 **save()** 작업과 **findBoard...()**를 연속해서 호출하기 때문에 `@Transactional` 처리를 함
+
+나중에 게시물의 댓글의 목록이 필요할 수 있으므로 **getListByBoard()**라는 메소드로 분리
