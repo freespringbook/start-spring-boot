@@ -276,3 +276,94 @@ replyManager는 즉시 실행 함수로 구성되어 있고 단 한 번만 실�
 
 서버 구동 후 테스트
 http://localhost:8080/boards/view?page=1&size=10&type=&keyword=&bno=301
+
+### 댓글 목록의 출력
+**view.html**에서는 `$(document).ready()`를 이용해 **replyManager**를 호출하는 코드를 작성
+```javascript
+<script th:inline="javascript" th:src="@{'/js/reply.js'}"></script>
+<script th:inline="javascript">
+    $(function (e) {
+        //load replies
+        replyManager.getAll([[${vo.bno}]], function (list) {
+        });
+    });
+</script>
+```
+
+`getJSON()`을 활용해 GET 방식으로 JSON 데이터를 가져옴
+```javascript
+var replyManager = (function () {
+    var getAll = function (obj, callback) {
+        console.log("get All....");
+
+        $.getJSON('/replies/'+obj, callback);
+    };
+
+```
+
+**view.html**에서 결과를 처리할 함수를 작성
+```javascript
+<script th:inline="javascript">
+    $(function (e) {
+        //load replies
+        replyManager.getAll([[${vo.bno}]], function (list) {
+            console.log('list........' + list);
+        });
+    });
+</script>
+```
+
+댓글 목록 테이블 구조 생성
+```html
+<div class='container'>
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>RNO</th>
+            <th>REPLY TEXT</th>
+            <th>REPLER</th>
+            <th>REPLY DATE</th>
+        </tr>
+        </thead>
+        <tbody id="replyTable" >
+        </tbody>
+    </table>
+</div>
+```
+
+`<tbody>` 내용 함수로 작성
+```javascript
+ <script th:inline="javascript">
+    $(function (e) {
+
+        (function getAllReplies(){
+            //load replies
+            replyManager.getAll([[${vo.bno}]], printList);
+        })();
+
+
+        function printList(list){
+            var str = "";
+            var replyObj;
+            for(var i = 0; i < list.length; i++){
+                replyObj = list[i];
+
+                str += "<tr>" +
+                    "<td>"+ replyObj.rno+" </td>" +
+                    "<td>"+ replyObj.replyText+" </td>" +
+                    "<td>"+ replyObj.replyer+" </td>" +
+                    "<td>"+ formatDate(replyObj.regdate)+" </td>" +
+                    "</tr>";
+            }
+            $("#replyTable").html(str);
+        }
+
+        function formatDate(timeValue){
+            var date = new Date(timeValue);
+            return  date.getFullYear()
+                + "-" + (date.getMonth()+1 >= 10?date.getMonth()+1 : '0'+ (date.getMonth()+1)  )
+                + "-" + date.getDate()
+        }
+    });
+</script>
+```

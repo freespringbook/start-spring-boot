@@ -1,6 +1,8 @@
 var replyManager = (function () {
     var getAll = function (obj, callback) {
         console.log("get All....");
+
+        $.getJSON('/replies/'+obj, callback);
     };
 
     var add = function (obj, callback) {
