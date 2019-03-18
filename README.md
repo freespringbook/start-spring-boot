@@ -385,3 +385,47 @@ var replyManager = (function () {
 ### 댓글 수정 처리
 - 댓글 수정 스크립트 추가
 - 댓글 수정 PUT 전송 처리
+
+## 5. 게시물 리스트에서의 댓글 개수 처리
+### 게시물과 댓글 수의 문제
+양방향으로 처리된 현재에는 아주 간단히 댓글의 개수만 숫자로 출력
+
+'N+1 검색'이라고 하는 상황으로 이와 같은 처리는 성능에 치명적인 문제가 발생할 수 있음
+
+'N+1'에서 많은 쿼리가 실행되는 가장 큰 이유는 게시물의 목록을 가져오는 쿼리가 단순히 tbl_webboards 테이블에만
+접근해서 처리하기 때문
+
+### @Query의 한계
+'N+1'을 처리하기 위한 가장 쉬운 접근 방식은 @Query를 이용해서 직접 필요한 엔티티들 간의 관계를 처리하는 것
+
+@Query의 가장 큰 한계는 **'JPQL의 내용이 고정된다'**는 점
+동적으로 변하는 사오항에 대한 처리가 어려움
+
+### 사용자 정의 쿼리 - 동적으로 JPQL 처리
+1. 원하는 기능을 별도의 사용자 정의 인터페이스로 설계
+2. 엔티티의 Repository 인터페이스를 설계할 때 사용자 정의 인터페이스 역시 같이 상속하도록 설계
+3. 엔티티 Repository를 구현하는 클래스를 생성. 이때에는 반드시 'Repository 이름'+'impl'로 클래스 이름 지정.
+   클래스 생성시에 부모 클래스를 QuerydslRepositorySupport로 지정
+4. Repository 인터페이스 impl 클래스에 JPQLQuery 객체를 이용해서 내용을 작성
+
+#### 사용자 정의 인터페이스 설계
+`org.zerock.persistence` 패키지에 CustomWebBoard라는 인터페이스를 설계
+
+#### 엔티티의 Repository 인터페이스 설계
+`org.zerock.persistence` 패키지에 CustomCrudRepository라는 인터페이스를 설계
+
+#### 사용자 정의 인터페이스의 구현
+실제로 JPQL을 코드로 처리하는 작업은 '엔티티 Repository 이름'+'Impl'로 작성
+
+클래스를 만들 때 주의할 점은 클래스의 이름과 QuerydslRepositorySupport를 부모 클래스로 지정
+QuerydslRepositorySupport 클래스는 생성자를 구현
+
+#### 테스트 코드의 작성 및 완성
+CustomRepositoryTests를 작성
+
+테스트 코드 실행 시 구현된 CustomCrudRepositoryImpl의 내용이 처리되면서 로그가 출력됨
+
+다음 단계로는 기존의 페이징 처리를 구현
+이때에는 Querydsl의 Qdomain등을 이용
+
+최종 테스트 확인 후 최종적으로 WebReply와의 조인을 처리 해주고, 검색 조건들을 처리
