@@ -429,3 +429,12 @@ CustomRepositoryTests를 작성
 이때에는 Querydsl의 Qdomain등을 이용
 
 최종 테스트 확인 후 최종적으로 WebReply와의 조인을 처리 해주고, 검색 조건들을 처리
+
+### 컨트롤러와 화면 처리
+WebBoardController는 CustomCrudRepository를 주입받도록 수정하고, list()를 수정
+
+SQL에서 서버에서 실행되는 쿼리가 기존과 달리 쿼리문이 한 번 실행 됨
+
+사용자 정의 쿼리를 생성하는 방식은 단계가 조금 복잡하기는 하지만, 코드를 이용해서
+마은대로 조작할 수 있다는 장점이 있음
+리플렉션 등을 이용한다면 좀 더 유연한 JQPL을 생성해서 처리할 수 있음

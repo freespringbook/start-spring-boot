@@ -41,7 +41,7 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 
         JPQLQuery<WebBoard> query = from(b);
 
-        JPQLQuery<Tuple> tuple = query.select(b.bno, b.title, b.writer, b.regdate);
+        JPQLQuery<Tuple> tuple = query.select(b.bno, b.title, r.count(), b.writer, b.regdate);
 
         tuple.leftJoin(r);
         tuple.on(b.bno.eq(r.board.bno));

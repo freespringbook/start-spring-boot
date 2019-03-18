@@ -2,6 +2,7 @@ package me.freelife.controller;
 
 import lombok.extern.java.Log;
 import me.freelife.domain.WebBoard;
+import me.freelife.persistence.CustomCrudRepository;
 import me.freelife.persistence.WebBoardRepository;
 import me.freelife.vo.PageMaker;
 import me.freelife.vo.PageVO;
@@ -22,7 +23,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class WebBoardController {
 
     @Autowired
-    private WebBoardRepository repo;
+    // private WebBoardRepository repo;
+    private CustomCrudRepository repo;
 
     @GetMapping("/register")
     public void registerGET(@ModelAttribute("vo") WebBoard vo) {
@@ -96,15 +98,21 @@ public class WebBoardController {
     }
 
     @GetMapping("/list")
-    public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
+    public void list(@ModelAttribute("pageVO") PageVO vo, Model model){
+
         Pageable page = vo.makePageable(0, "bno");
 
-        Page<WebBoard> result = repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), page);
+        Page<Object[]> result = repo.getCustomPage(vo.getType(),
+                vo.getKeyword(), page);
 
-        log.info("" + page);
-        log.info("" + result);
+        log.info(""+ page);
+        log.info(""+result);
 
         log.info("TOTAL PAGE NUMBER: " + result.getTotalPages());
-        model.addAttribute("result", new PageMaker(result));
+        log.info("result = "+new PageMaker<>(result));
+
+
+        model.addAttribute("result", new PageMaker<>(result));
+
     }
 }
