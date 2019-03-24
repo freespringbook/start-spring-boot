@@ -57,3 +57,6 @@ Member 와 MemberRole 클래스를 생성
 #### 연관관계의 설정
 - Member와 MemberRole은 '일대다', '다대일'의 관계
 - MemberRole 자체가 단독으로 생성되는 경우는 거의 없으므로, Member가 MemberRole을 관리하는 방식의 설계
+
+### Repository 생성
+MemberRepository 생성
