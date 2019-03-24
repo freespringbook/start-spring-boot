@@ -94,3 +94,13 @@ HttpSecurity는 웹과 관련된 다양한 보안설정을 걸어줄 수 있음
   - hasRole(): 시스템상에서 특정 권한을 가진 사람만이 접근할 수 있음
 
 '/guest', '/manager'로 접근 테스트 '/manager'은 Access Denied' 메세지 출력
+
+#### 로그인 페이지 보여주기
+'/login'으로 접근해 권한을 인가 받도록 configure() 수정
+
+`formLogin()`: form 태그 기반의 로그인을 지원하겠다는 설정
+
+스프링 시큐리티에서 기본 로그인 화면 제공
+
+#### 로그인 정보 설정하기
+로그인 처리를 위해 SecurityConfig에 AuthenticationManagerBuilder를 주입해서 인증 처리
