@@ -139,3 +139,15 @@ HttpSecurity에서 exceptionHandling()을 이용해서 권한이 없을 경우
 '/accessDenied'라는 URI가 처리할 것이므로 LoginController에 메소드 작성
 
 templates에 accessDenied.html 작성
+
+#### 로그아웃 처리
+HttpSession의 정보를 무효화시키고 필요한 경우에는 모든 쿠키를 삭제
+
+`logout()` 뒤에는 `invalidateHttpSession()` 과 `deleteCookie()`를 이용해서 처리
+
+로그아웃을 특정한 페이지에서 진행하고 싶다면 먼저 로그아웃을 처리하는 URI를 처리 해야하고  
+POST 방식으로 로그아웃을 시도
+
+SecurityConfig의 configure()에서 로그아웃을 위한 URI를 지정
+
+templates에는 logout.html 작성
