@@ -104,3 +104,38 @@ HttpSecurity는 웹과 관련된 다양한 보안설정을 걸어줄 수 있음
 
 #### 로그인 정보 설정하기
 로그인 처리를 위해 SecurityConfig에 AuthenticationManagerBuilder를 주입해서 인증 처리
+
+#### 로그인 관련 정보 삭제하기
+개발자 도구 -> Application 탭 -> Cookies 쿠키 확인  
+Cookies 메뉴에서 Clear로 브라우저 종료
+
+#### 커스텀 로그인 페이지 만들기
+1. `formLogin()` 이후 `loginPage()` 메소드를 이용해서 URI 지정
+2. LoginController 클래스 생성
+3. templates 폴더 내에 login.html 작성
+   스프링 시큐리티는 기본적으로 username과 password라는 이름을 이용
+   `<input>`태그의 name 속성값을 변경할 수 없음
+   action 속성을 지정하지 않았으므로 버튼 클릭시 '/login'으로 이동 POST 방식으로 데이터 전송
+
+`ㅡcsrf`: `<form>`태그의 내부에 hidden 속성으로 작성된 속성
+  - 사이트 간 요청 위조(Cross-site request forgery, CSRF, XSRF)를 방지하기 위한 것
+  - 요청을 보내는 URL에서 서버가 가진 동일한 값과 같은 값을 가지고 데이터를 전송할 때에만 신뢰하기 위한 방법
+
+실제로 모든 작업은 여러 종류의 Filter들과 Interceptor를 통해서 동작  
+개발자 입장에서는 적절한 처리를 담당하는 핸들러(Handler)들을 추가하는 것만으로 모든 처리가 완료됨
+
+스프링 시큐리티가 적용되면 **POST 방식으로 보내는 모든 데이터는 CSRF 토큰 값이 필요**해짐
+> CSRF 토큰을 사용하지 않으려면 `application.properties`에 `security.enable-csrf` 속성을 이용해서  
+> CSRF 토큰을 사용하지 않도록 설정 해야 함
+
+#### 접근 권한 없음 페이지 처리
+'/admin' 경로로 접근하면 브라우저는 자동으로 '/login' 경로로 이동함
+
+HttpSecurity에서 exceptionHandling()을 이용해서 권한이 없을 경우  
+알려주고 로그인 화면으로 이동할 수 있도록 안내 페이지 작성
+
+`exceptionHandling()` 이후에 메소드는 `accessDeniedPage()`나 `accessDeniedHandler()`를 이용하는 것이 일반적
+
+'/accessDenied'라는 URI가 처리할 것이므로 LoginController에 메소드 작성
+
+templates에 accessDenied.html 작성
