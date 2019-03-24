@@ -60,3 +60,19 @@ Member 와 MemberRole 클래스를 생성
 
 ### Repository 생성
 MemberRepository 생성
+
+### 테스트를 통한 데이터 추가/조회
+1. 테스트 클래스인 MemberTests 클래스 생성
+2. 데이터 추가 코드
+3. testInsert() 100명의 사용자 생성
+4. 사용자 중 user0 부터 user80까지는 'BASIC'이라는 권한
+   user90까지는 'MANAGER' 나머지 10명은 'ADMIN' 권한을 가지도록 설계
+
+> Member 엔티티와 MemberRole 엔티티를 동시에 저장해서 에러가 발생  
+> 이에 대한 처리로 cascade 설정을 추가
+
+5. 회원 데이터와 함께 권한들에 대한 정보를 같이 조회할 수 있도록 조회 작업 진행
+
+> tbl_members와 tbl_member_roles 테이블을 둘 다 조회해야 하기 때문에  
+> 트랜잭션 처리를 해주거나 즉시 로딩을 이용해서 조인을 하는 방식으로 처리
+> fetch 모드를 즉시 로딩으로 설정

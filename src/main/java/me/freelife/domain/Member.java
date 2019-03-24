@@ -40,7 +40,7 @@ public class Member {
   @UpdateTimestamp
   private Timestamp updatedate;
 
-  @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "member")
   private List<MemberRole> roles;
 
