@@ -76,3 +76,21 @@ MemberRepository 생성
 > tbl_members와 tbl_member_roles 테이블을 둘 다 조회해야 하기 때문에  
 > 트랜잭션 처리를 해주거나 즉시 로딩을 이용해서 조인을 하는 방식으로 처리
 > fetch 모드를 즉시 로딩으로 설정
+
+## 3. 단순 시큐리티 적용
+https://spring.io/guides/topicals/spring-security-architecture
+웹에서 스프링 시큐리티는 기본적으로 필터 기반으로 동작
+내부에는 상당히 많은 종류의 필터들이 이미 존재하므로 개발 시 필터들의 설정을 조정하는 방식을 주로 사용
+
+### 로그인/로그아웃 관련 처리
+#### 특정 권한을 가진 사람만이 특정 URI에 접근하기
+SecurityConfig 클래스에는 configure() 메소드를 이용해서 웹 자원에 대한 보안을 확인  
+HttpSecurity는 웹과 관련된 다양한 보안설정을 걸어줄 수 있음
+
+특정한 경로에 특정한 권한을 가진 사용자만 접근할 수 있도록 설정
+- authorizeRequests(): 시큐리티 처리에 HttpServletRequest를 이용한다는 것을 의미
+- antMatches(): 특정한 경로를 지정
+  - permitAll(): 모든 사용자가 접근할 수 있음
+  - hasRole(): 시스템상에서 특정 권한을 가진 사람만이 접근할 수 있음
+
+'/guest', '/manager'로 접근 테스트 '/manager'은 Access Denied' 메세지 출력

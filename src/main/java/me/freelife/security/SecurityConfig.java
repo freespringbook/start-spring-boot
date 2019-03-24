@@ -11,5 +11,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         log.info("security config.....................");
+
+        http
+            .authorizeRequests()
+                .antMatchers("/guest/**").permitAll();
+
+        http
+            .authorizeRequests()
+                .antMatchers("/manager/**").hasRole("MANAGER");
     }
 }
