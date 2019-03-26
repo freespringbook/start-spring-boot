@@ -151,3 +151,56 @@ POST 방식으로 로그아웃을 시도
 SecurityConfig의 configure()에서 로그아웃을 위한 URI를 지정
 
 templates에는 logout.html 작성
+
+## 4. 다양한 인증 방식
+- 인증 매니저(Authentication Manager): 인증에 대한 실제적인 처리를 담당
+  - UserDetails: '인증 매니저'는 결과적으로 인증과 관련된 모든 정보를 이 타입으로 반환
+    사용자 계정과 같은 정보와 더불어 사용자가 어떤 권한들을 가지고 있는지를 Collection 타입으로 가지고 있음
+  - UserDetailsService: 자신이 어떻게 관련 정보를 처리해아 하는지 판단
+    인증되는 방식을 수정하고 싶다면 UserDetailsService라는 인터페이스를 구현하고, 인증 매니저에 연결
+
+![](img/1.png)
+
+### 스프링 시큐리티의 용어에 대한 이해
+- AuthenticationManager(인증 매니저)
+  - AuthenticationManagerBuilder(인증 매니저 빌더)
+    - JDBC, LDAP
+    - authenticate()
+  - Authentication(인증)
+- UserDetailsService 인터페이스
+  - UserDetailsManager 인터페이스
+  - loadUserByUsername()
+- UserDetails 인터페이스
+  - User 클래스
+
+- 모든 인증은 인증 매니저(AuthenticationManager)를 통해서 이루어진다
+  인증 매니저를 생성하기 위해 인증 매니저 빌더(AuthenticationManagerBuilder)라는 존재가 사용된다
+- 인증 매니저를 이용해서 인증(Authentication)이라는 작업이 수행된다
+- 인증 매니저들은 인증/인가를 위한 UserDetailsService를 통해서 필요한 정보들을 가져온다
+- UserDetails는 사용자의 정보 + 권한 정보들의 묶음이다
+
+### JDBC를 이용한 인증 처리
+- JdbcUserDetailsManagerConfigurer: 데이터베이스를 연동하여 로그인/로그아웃 처리
+
+스프링 시큐리티가 데이터베이스를 연동하는 방법
+1. 직접 SQL등을 지정해서 처리하는 방법
+  - DataSource 타입의 객체를 주입
+  - 사용자에 대한 계정 정보와 권한을 체크하는 부분에는 DataSource를 이용하고 SQL을 지정
+  - 사용자의 계정 정보를 이용해서 필요한 정보를 가져오는 SQL 필요
+  - 해당 사용자의 권한을 확인하는 SQL 필요
+
+2. 기존에 작성된 Repository나 서비스 객체들을 이용해서 별도로 시큐리티 관련 서비스를 개발하는 방법
+
+
+##### userByUsernameQuery()
+userByUsernameQuery()를 이용하는 경우 우선 username과 password, enabled라는 칼럼의 데이터가 필요  
+- Enabled: 해당 계정이 사용 가능한지를 의미(만일 적절한 데이터가 없다면 무조건 true를 이용하도록 설정)
+
+##### authoritiesByUsernameQuery()
+authoritiesByUsernameQuery()의 파라미터로 사용되는 SQL은 실제 권한에 대한 정보를 가져오는 SQL  
+이때 사용하는 SQL은 username 하나의 파라미터를 전달, username과 권한 정보를 처리하도록 작성
+
+##### rolePrefix()
+'/manager'라는 경로로 접근하려면 'ROLE_MANAGER'라는 이름의 권한이 필요함  
+DB에는 'ROLE_라는 문자열은 없고 단순히 'BASIC, MANAGER, ADMIN'으로 되어있으므로  
+rolePrefix()라는 메서드로 'ROLE_'라는 문자열을 붙임
