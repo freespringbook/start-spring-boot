@@ -227,3 +227,20 @@ SimpleGrantedAuthority 클래스는 GrantedAuthority라는 인터페이스의 �
 GrantedAuthority 인터페이스는 문자열을 반환하는 getAuthority() 메소드 하나만을 가지고 있음
 
 '/manager'의 경로에 로그인 패스워드는 '1111'을 입력해서 처리
+
+### MemberRepository와의 연동
+FreelifeUserService에 MemberRepository 인스턴스를 주입해 줄 필요가 있음
+
+MemberRepository의 findById()는 PK를 이용해서 Member 엔티티 인스턴스를 얻어오지만
+UserDetails라는 리턴 타입에는 맞지 않음
+
+Member 타입의 인스턴스를 UserDetails로 처리하려면
+1. Member 클래스에 UserDetails 인터페이스를 구현해 주는 방법을 이용
+2. Member 클래스가 이미 UserDetails 인터페이스를 구현한 User 클래스를 상속
+3. 조합을 이용해서 Member를 포함하는 별도의 클래스를 만드는 방법을 사용
+
+#### FreelifeSecurityUser 클래스의 생성
+security 폴더에 FreelifeSecurityUser라는 클래스를 스프링 시큐리티의 User 클래스를 상속받는 형태로 생성
+
+FreelifeUserService에서는 Member 타입의 인스턴스를 이용해서 FreelifeSecurityUser를 생성  
+FreelifeSecurityUser는 Member를 이용하도록 수정
