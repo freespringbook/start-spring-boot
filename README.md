@@ -279,3 +279,24 @@ Thymeleaf로 작성된 페이지에서는 다음과 같은 순서로 스프링 �
 #authentication.principal.member와 같이 '.'를 이용해서 접근
 
 표현식을 `th:width`를 지정해서 짧게 줄여서 사용 가능 
+
+## 6. Remember-Me 인증하기
+스프링 시큐리티의 Remember-me 기능은 기본적으로 사용자가 로그인했을 때의 특정한 토큰 데이터를  
+2주간 유지되도록 쿠키를 생성함  
+브라우저에 전송된 쿠키를 이용해서 로그인 정보가 필요하면 저장된 토큰을 이용해서 다시 정보를 사용함
+
+### 로그인 화면에서 'remember-me' 체크박스 처리
+login.html에 remember-me 체크박스 추가
+
+### SecurityConfig에서의 설정
+'remember-me'기능을 설정하기 위해서는 UserDetailsService를 이용해야 함  
+HttpSecurity 인스턴스에 간단히 rememberMe()를 이용해주면 처리가 가능함
+
+rememberMe()에서는 쿠키의 값으로 암호화된 값을 전달하므로 암호의 '키(key)'를 지정하여 사용함
+
+로그인 화면에서 'remember-me'를 선택한 후 로그인하면 브라우저상에는 기본적인 JSESSIONID(톰캣의 경우에 생성된 세션의 키)  
+의 쿠키 외에도 'remember-me'라는 이름의 쿠키가 생성됨
+
+생성된 'remember-me' 쿠키의 Expires(유효기간)는 '로그인 시간 + 2주'  
+쿠키는 유효기간이 설정되면 브라우저 내부에 저장됨  
+브라우저는 보관된 'remember-me'쿠키를 그대로 가지고 서버에 접근하게 됨

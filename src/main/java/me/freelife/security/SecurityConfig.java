@@ -47,7 +47,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout().logoutUrl("/logout").invalidateHttpSession(true);
 
         // freelifeUserService를 사용하도록 설정
-        http.userDetailsService(freelifeUserService);
+        // http.userDetailsService(freelifeUserService);
+
+        //remember-me 설정
+        http.rememberMe().key("freelife").userDetailsService(freelifeUserService);
     }
 
 
