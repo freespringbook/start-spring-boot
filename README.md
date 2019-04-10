@@ -300,3 +300,33 @@ rememberMe()에서는 쿠키의 값으로 암호화된 값을 전달하므로 �
 생성된 'remember-me' 쿠키의 Expires(유효기간)는 '로그인 시간 + 2주'  
 쿠키는 유효기간이 설정되면 브라우저 내부에 저장됨  
 브라우저는 보관된 'remember-me'쿠키를 그대로 가지고 서버에 접근하게 됨
+
+### remember-me를 데이터베이스에 보관하기
+스프링 시큐리티는 기본적으로 'remember-me' 기능을 사용하기 위해서 'Hash-based Token 저장 방식'과  
+'Persistent Token 저장 방식'을 사용할 수 있음  
+
+기본은 'Hash-based' 방식
+
+'remember-me' 쿠키의 생성은 기본적으로 'username'과 쿠키의 만료시간, 패스워드를 Base-64 방식으로 인코딩한 것  
+사용자가 패스워드를 변경하면 정상적인 값이라도 로그인이 될 수 없다는 단점이 있음
+
+이를 해결하기 위해서 가능하면 데이터베이스를 이용해서 처리하는 방식을 권장  
+`org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl` 클래스를 이용  
+`PersistenceTokenRepository`라는 인터페이스를 이용해 원하는대로 구현 가능  
+
+토큰을 보관할 수 있는 테이블 생성
+```sql
+create table persistent_logins (
+    username varchar(64) not null,
+    series varchar(64) primary key,
+    token varchar(64) not null,
+    last_used timestamp not null
+);
+```
+
+설정 추가 후 'remember-me'를 선택한 로그인을 하면 'persistent_logins'테이블에  
+생성된 토큰의 값이 기록되는 것을 확인할 수 있음
+
+브라우저에서는 해당 토큰을 이용한 쿠키가 생성됨
+
+이제 쿠키의 생성은 패스워드가 아니라 series에 있는 값을 기준으로 하게 됨

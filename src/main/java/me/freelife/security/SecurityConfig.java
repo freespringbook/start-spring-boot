@@ -8,10 +8,18 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 @Log
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    //데이터베이스를 이용하려면 DataSource가 필요하므로 주입
+    @Autowired
+    DataSource dataSource;
 
     @Autowired
     FreelifeUserService freelifeUserService;
@@ -51,6 +59,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //remember-me 설정
         http.rememberMe().key("freelife").userDetailsService(freelifeUserService);
+
+        //HttpSecurity 가 데이터베이스를 이용하도록 설정
+        http.rememberMe()
+                .key("freelife")
+                .userDetailsService(freelifeUserService)
+                .tokenRepository(getJDBCRepository())
+                .tokenValiditySeconds(60*60*24); // 쿠키의 유효시간을 초단위로 설정하는데 사용 24시간 유지하는 쿠키 생
+    }
+
+    /**
+     * HttpSecurity에서 JdbcTokenRepositoryImpl을
+     * 이용해 데이터베이스를 이용하도록 설정
+     * @return
+     */
+    private PersistentTokenRepository getJDBCRepository(){
+        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+        repo.setDataSource(dataSource);
+        return repo;
     }
 
 
