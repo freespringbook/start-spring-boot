@@ -244,3 +244,38 @@ security 폴더에 FreelifeSecurityUser라는 클래스를 스프링 시큐리�
 
 FreelifeUserService에서는 Member 타입의 인스턴스를 이용해서 FreelifeSecurityUser를 생성  
 FreelifeSecurityUser는 Member를 이용하도록 수정
+
+## 5. 화면에서 로그인한 사용자 정보 사용하기
+스프링 시큐리티의 정보를 Thymeleaf에서 사용하기 위해서는 Spring Security Dialect라는 것을 이용해야 함
+http://github.com/thymeleaf/thymeleaf-extras-springsecurity
+
+Maven등을 이용할 때에 https://mvnrepository.com/artifact/org.thymeleaf.extras 를 이용해서 필요한 라이브러리를 추가
+
+## Thymeleaf에서 스프링 시큐리티 처리하기
+Thymeleaf로 작성된 페이지에서는 다음과 같은 순서로 스프링 시큐리티를 이용할 수 있다
+1. 시큐리티 관련 네임스페이스 추가
+2. 네임스페이스를 이용한 태그 작성
+
+'authorize-url': 특정한 권한을 가진 사용자에게만 버튼이나 링크가 보이도록 하는 기능
+```html
+<p sec:authorize-url="/admin/aaa">
+    <a href="/admin/aaa">ADMIN AAA</a>
+</p>
+
+<p sec:authorize-url="/manager/aaa">
+    <a href="/manager/aaa">MANAGER AAA</a>
+</p>
+```
+
+특정한 권한을 가진 사용자들에게만 보여주여야 할 내용이 있다면 'hasRole()' 표현식을 그대로 적용
+```html
+<h1 sec:authorize="hasRole('ROLE_ADMIN')">
+    This content is only for administrators.
+</h1>
+```
+
+실제 데이터베이스 상의 사용자 정보를 포함하는 경우에는 principal 이라는 속성을 이용  
+로그인된 회원의 정보는 #authentication.principal 내부에 존재 하므로  
+#authentication.principal.member와 같이 '.'를 이용해서 접근
+
+표현식을 `th:width`를 지정해서 짧게 줄여서 사용 가능 

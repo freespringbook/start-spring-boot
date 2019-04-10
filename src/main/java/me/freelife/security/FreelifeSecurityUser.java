@@ -24,6 +24,8 @@ public class FreelifeSecurityUser extends User {
 
         super(member.getUid(), member.getUpw(), makeGrantedAuthority(member.getRoles()));
 
+        this.member = member;
+
     }
 
     private static Collection<? extends GrantedAuthority> makeGrantedAuthority(List<MemberRole> roles) {
@@ -31,6 +33,7 @@ public class FreelifeSecurityUser extends User {
         List<GrantedAuthority> list = new ArrayList<>();
 
         roles.forEach(role -> list.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRoleName())));
+
         return list;
     }
 }
