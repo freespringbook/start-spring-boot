@@ -330,3 +330,25 @@ create table persistent_logins (
 브라우저에서는 해당 토큰을 이용한 쿠키가 생성됨
 
 이제 쿠키의 생성은 패스워드가 아니라 series에 있는 값을 기준으로 하게 됨
+
+## 7. 기타 시큐리티 설정
+### MVC에 어노테이션 처리하기
+URI에 간단한 어노테이션만을 이용해서 접근을 제한
+- @Secured: 문자열의 배열이나 문자열을 이용해서 권한을 지정
+
+제대로 작동 시키기 위해서 SecurityConfig에 `@EnableGlobalMethodSecurity`라는 어노테이션을 추가해 주고
+securedEnabled 속성의 값을 true로 지정
+
+### PasswordEncoder 사용하기
+스프링 시큐리티는 패스워드를 쉽게 암호화할 수 있는 PasswordEncoder라는 인터페이스를 기준으로 제공
+
+암호화와 관련된 내용 참고
+http://d2.naver.com/helloworld/318732
+
+적용하는 방식 
+1. 구현 클래스 작성
+2. 시큐리티 설정 추가
+3. 관련 컨트롤러나 서비스와 연동하는 방식으로 구현
+
+### 컨트롤러를 이용한 회원가입 처리
+암호화를 테스트하기 위해 MemberController를 하나 작성하고 실제로 회원가입을 처리할 수 있는 기본 구조 생성
