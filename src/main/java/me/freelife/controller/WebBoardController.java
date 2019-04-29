@@ -3,7 +3,6 @@ package me.freelife.controller;
 import lombok.extern.java.Log;
 import me.freelife.domain.WebBoard;
 import me.freelife.persistence.CustomCrudRepository;
-import me.freelife.persistence.WebBoardRepository;
 import me.freelife.vo.PageMaker;
 import me.freelife.vo.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;

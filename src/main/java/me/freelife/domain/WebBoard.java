@@ -9,7 +9,8 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
