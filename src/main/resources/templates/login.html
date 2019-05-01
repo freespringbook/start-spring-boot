@@ -4,8 +4,8 @@
 
 <div layout:fragment="content">
 
-    <div class="panel-heading">Login Page</div>
-    <div class="panel-body">
+    <div class="card-header">Login Page</div>
+    <div class="card-body">
 
         <div th:if="${param.error != null}">
             <h2>Invalid Username or password</h2>
@@ -20,12 +20,12 @@
 
             <form method="post">
                 <p>
-                    <label for="username">Username</label> <input type="text"
-                                                                  id="username" name="username" value="user88" />
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="user88" />
                 </p>
                 <p>
-                    <label for="password">Password</label> <input type="password"
-                                                                  id="password" name="password" value="pw88" />
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" value="pw88" />
                 </p>
 
                 <p>

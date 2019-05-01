@@ -125,3 +125,19 @@ LoginController, MemberController 추가
 login.html 파일을 추가
 
 로그인 하지 않은 사용자가 로그인한 사용자만 접근 가능한 페이지에 접근시 로그인 요청
+
+### 게시물 작성 시 사용자 아이디 편집
+로그인한 사용자 아이디를 작성자의 입력란에 자동으로 처리
+
+Thymeleaf-security 이용해서 처리
+
+스프링 시큐리티 적용시 GET 방식을 제외한 POST 등의 방식으로 전송할 경우
+CSRF 토큰 값이 반드시 필요
+
+`<form>` 태그에 Thymeleaf의 속성을 추가하면 자동으로 'CSRF' 필터가 적용되어 있음
+때문에 직접 CSRF 값을 지정할 필요없이 `<form>` 데이터를 전송할 수 있음
+
+```html
+<form action="register" method="post"><input type="hidden" name="_csrf" value="10a0f3b7-cd1d-44fc-adc8-91a05ae9fba1">
+<input type="hidden" name="_csrf" value="10a0f3b7-cd1d-44fc-adc8-91a05ae9fba1">
+```
