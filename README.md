@@ -102,3 +102,15 @@ logging.level.me.freelife=debug
 #### 4. maven compile 수행하여 Querydsl QWebBoard 생성
 #### 5. 프로젝트 실행
 security 기본 user 계정으로 로그인 '/board/list' 화면 출력확인
+
+### 시큐리티 설정
+#### domain 패키지
+Member, MemberRole 추가
+
+#### persistence 패키지
+MemberRepository 추가
+
+#### controller 패키지
+LoginController, MemberController 추가
+
+#### security 패키지 복사
