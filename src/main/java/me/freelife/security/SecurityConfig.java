@@ -34,30 +34,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
             .authorizeRequests()
-                .antMatchers("/guest/**").permitAll();
-
-        http
-            .authorizeRequests()
-                .antMatchers("/manager/**").hasRole("MANAGER");
-
-        http
-            .authorizeRequests()
-                .antMatchers("/admin/**").hasRole("ADMIN");
+                .antMatchers("/boards/list").permitAll()
+                .antMatchers("/boards/register")
+                .hasAnyRole("BASIC","MANAGER","ADMIN"); //여러 개의 Role을 설정할 수 있음
 
         //로그인 페이지
-        http.formLogin().loginPage("/login");
+        http.formLogin()
+                .loginPage("/login");
 
         //접근 권한 없음 페이지 처리
         http.exceptionHandling().accessDeniedPage("/accessDenied");
 
         //세션 무효화
         http.logout().logoutUrl("/logout").invalidateHttpSession(true);
-
-        // freelifeUserService를 사용하도록 설정
-        // http.userDetailsService(freelifeUserService);
-
-        //remember-me 설정
-        // http.rememberMe().key("freelife").userDetailsService(freelifeUserService);
 
         //HttpSecurity 가 데이터베이스를 이용하도록 설정
         http.rememberMe()

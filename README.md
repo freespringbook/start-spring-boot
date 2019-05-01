@@ -114,3 +114,14 @@ MemberRepository 추가
 LoginController, MemberController 추가
 
 #### security 패키지 복사
+
+## 2. 게시물 작성 부분
+로그인한 사용자만 특정 URI에 접근이 가능하도록 설정
+
+- 아래의 시큐리티 설정 추가
+'/boards/list' 모든 사용자가 접근
+'/boards/register' 로그인한 사용자만 접근
+
+login.html 파일을 추가
+
+로그인 하지 않은 사용자가 로그인한 사용자만 접근 가능한 페이지에 접근시 로그인 요청
