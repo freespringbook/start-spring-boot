@@ -198,3 +198,7 @@ Thymeleaf의 th:action을 처리하기 위해서는 반드시 CRSF 값을 생성
 ### 인터셉터 설정
 스프링 부터 프로젝트에 MVC 관련된 설정을 하기 위해서는 WebMvcConfigurerAdapter라는 추상 클래스를 이용했었음  
 하지만 스프링 부터 1.4이후에 deprecated 되었기 때문에 과거와는 조금 다른 방식으로 구현하게 됨
+
+### AuthenticationSuccessHandler 추가
+시큐리티 로그인 처리후 이동을 제어  
+AuthenticationSuccessHandler 인터페이스를 구현하면 로그인 처리 후 원하는 동작을 제어할 수 있음
