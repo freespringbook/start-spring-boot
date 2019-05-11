@@ -8,6 +8,8 @@
     <div class="card-header">View Page</div>
     <div class="card-body">
 
+        <!-- CSRF 토큰이 처리되도록 의미 없는 태그를 하나추가 -->
+        <form th:action="${'/login'}"></form>
 
         <div class="form-group">
             <label>BNO</label> <input class="form-control" name="bno"
@@ -104,7 +106,7 @@
                     <input type="text" class="form-control" name='replyText'>
 
                     <label>Replyer</label>
-                    <input type="text" class="form-control" name='replyer'>
+                    <input type="text" class="form-control" name='replyer' readonly="readonly">
                 </div>
                 <div class="modal-footer">
                     <button id='delModalBtn'class="btn btn-danger">Delete</button>
@@ -126,24 +128,41 @@
 
     <script th:inline="javascript">
 
-        $(function (e) {
+        $(function (e){
 
             var mode;
+            var replyTextObj = $("input[name='replyText']");
+            var replyerObj = $("input[name='replyer']");
+
+            var bno = [[${vo.bno}]];
+            var rno;
+
+            // 스크립트로 로그인한 사용자에 따라 버튼 제어
+            var uid =[[${#authentication.principal} eq 'anonymousUser'? null :${#authentication.principal.member.uid}]];
+            // csrf 객체 JavaScript 객체로 변환
+            var csrf = JSON.parse('[[${_csrf}]]');
+
             //댓글 추가 버튼 클릭시 모달창 열기 닫기
             $("#addReplyBtn").on('click', function(){
+                // 로그인 하지 않은 사용자는 로그인 페이지로 이동
+                if(uid == null){
+                    if(confirm("로그인 할까요?")){
+                        self.location = [[@{/login}]];
+                    }
+                    return;
+                }
+
+                // 로그인한 사용자는 사용자의 아이디가 댓글 입력창에 고정됨
+                replyerObj.val(uid);
 
                 $("#myModal").modal("show");
                 $(".modal-title").text("Add Reply");
 
-                replyTextObj.val("");
-                replyerObj.val("");
                 $("#delModalBtn").hide(); //댓글 추가시에는 삭제버튼 숨기기
 
                 mode= "ADD";
             });
 
-            // 스크립트로 로그인한 사용자에 따라 버튼 제어
-            var uid =[[${#authentication.principal} eq 'anonymousUser'? null :${#authentication.principal.member.uid}]] ;
             // 게시글 수정/삭제 버튼 클릭 처리
             $("#goModBtn").click(function(e){
 
@@ -164,8 +183,6 @@
                 }
             });
 
-            var bno = [[${vo.bno}]];
-            var rno;
             // 댓글 삭제 버튼 클릭 처리
             $("#delModalBtn").on("click", function(){
 
@@ -178,9 +195,6 @@
                 });
 
             });
-
-            var replyTextObj = $("input[name='replyText']");
-            var replyerObj = $("input[name='replyer']");
 
             // 댓글 테이블 클릭시 댓글 수정 모달창 띄우기
             $("#replyTable").on("click", "tr", function(e){
@@ -215,7 +229,12 @@
 
                 if(mode =='ADD'){ // 추가일 때
 
-                    var obj = {replyText:replyText, replyer: replyer, bno:bno};
+                    var obj = {
+                        replyText:replyText,
+                        replyer: replyer,
+                        bno:bno,
+                        csrf:csrf //csrf 객체를 같이 전송
+                    };
 
                     //console.log(obj);
 

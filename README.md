@@ -153,3 +153,24 @@ CSRF 토큰 값이 반드시 필요
 ## 4. 게시물의 수정/삭제
 게시물 수정/삭제가 로그인한 사용자들만 가능하도록  
 SecurityConfig에 추가 하거나 WebBoardController에 @Secure를 이용해서 처리
+
+## 5. Ajax의 시큐리티 처리
+댓글은 Ajax로 처리되기 때문에 별도로 처리가 필요한데  
+Ajax로 호출하는 작업에 CSRF 값이 같이 전송 되어야 함
+
+### 댓글 추가
+화면상에 댓글을 추가하는 버튼을 누르면 로그인을 하도록 유도하기 위해 JavaScript를 이용
+
+가장 중요한 부분은 Ajax 전송 시 'X-CSRF-TOKEN'헤더를 지정해 주는 것  
+csrf 객체에서 headerName과 token 값을 이용해서 HTTP 헤더 정보를 구성
+
+### illegalStateException 에러 대비
+```
+java.lang.illegalStateException: Cannot create a session after the response has been committed
+```
+시큐리티 설정이 필요한 페이지에서 사용할 때에는 서버에서 illegalStateException 메시지가 출력되는 경우가 있음
+
+이러한 메시지가 출력되는 이유는 CSRF 토큰이 만들어지기 전에 사용하면서 발생  
+이를 해결하는 가장 간단한 방법은 페이지에 `<form th:action="${'/login'}"></form>`과 같이 의미 없는 `<form>`태그를 추가하는 것
+
+Thymeleaf의 th:action을 처리하기 위해서는 반드시 CRSF 값을 생성해 내기 때문에 이와 같은 상황에서 유용

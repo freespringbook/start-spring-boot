@@ -18,6 +18,11 @@ var replyManager = (function () {
             url: '/replies/'+ obj.bno,
             data:JSON.stringify(obj),
             dataType:'json',
+            // 전달된 csrf 객체를 처리
+            // 이 코드를 이용해서 실제로 댓글을 추가하면 브라우저는 서버에 'X-CSRF-TOKEN' 헤더를 추가한 상태에서 전송하게 됨
+            beforeSend : function(xhr){
+                xhr.setRequestHeader(obj.csrf.headerName, obj.csrf.token);
+            },
             contentType: "application/json",
             success:callback
         });
