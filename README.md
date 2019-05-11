@@ -164,7 +164,7 @@ Ajax로 호출하는 작업에 CSRF 값이 같이 전송 되어야 함
 가장 중요한 부분은 Ajax 전송 시 'X-CSRF-TOKEN'헤더를 지정해 주는 것  
 csrf 객체에서 headerName과 token 값을 이용해서 HTTP 헤더 정보를 구성
 
-### illegalStateException 에러 대비
+#### illegalStateException 에러 대비
 ```
 java.lang.illegalStateException: Cannot create a session after the response has been committed
 ```
@@ -174,3 +174,9 @@ java.lang.illegalStateException: Cannot create a session after the response has 
 이를 해결하는 가장 간단한 방법은 페이지에 `<form th:action="${'/login'}"></form>`과 같이 의미 없는 `<form>`태그를 추가하는 것
 
 Thymeleaf의 th:action을 처리하기 위해서는 반드시 CRSF 값을 생성해 내기 때문에 이와 같은 상황에서 유용
+
+### 댓글 수정/삭제
+댓글의 수정과 삭제는 현재 로그인한 사용자가 작성한 댓글만 가능하므로  
+화면에서 버튼을 제어할 필요가 있음
+
+댓글 추가와 동일하게 csrf 객체 전달 하도록 수정

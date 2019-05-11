@@ -74,7 +74,10 @@ public class WebReplyController {
         log.info("modify reply: "+ reply);
 
         replyRepo.findById(reply.getRno()).ifPresent(origin -> {
+
             origin.setReplyText(reply.getReplyText());
+            origin.setReplyer(reply.getReplyer());
+
             replyRepo.save(origin);
         });
 

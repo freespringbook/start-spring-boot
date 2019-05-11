@@ -147,7 +147,7 @@
                 // 로그인 하지 않은 사용자는 로그인 페이지로 이동
                 if(uid == null){
                     if(confirm("로그인 할까요?")){
-                        self.location = [[@{/login}]];
+                        self.location = '[[@{/login}]]';
                     }
                     return;
                 }
@@ -186,7 +186,11 @@
             // 댓글 삭제 버튼 클릭 처리
             $("#delModalBtn").on("click", function(){
 
-                var obj = {bno:bno, rno:rno};
+                var obj = {
+                    bno:bno,
+                    rno:rno,
+                    csrf:csrf //csrf 객체를 같이 전송
+                };
 
                 replyManager.remove(obj, function(list){
 
@@ -201,8 +205,6 @@
 
                 var tds = $(this).find('td');
 
-                console.log(tds);
-
                 rno = tds[0].innerHTML;
                 mode ='MOD';
 
@@ -211,6 +213,20 @@
                 $("#delModalBtn").show(); // 댓글 수정시에는 삭제버튼 보이게
                 $("#myModal").modal("show");
                 $(".modal-title").text("Modiy/Delete Reply");
+
+                console.log("==================");
+                console.log(uid);
+                console.log(tds[2].innerHTML);
+
+                console.log(uid == tds[2].innerHTML);
+
+                // 자신이 작성하지 않은 댓글을 수정하거나 삭제하는 작업은 제한되도록 버튼 자체가 보이지 않음
+                if(uid != tds[2].innerHTML.trim() ){
+
+                    $("#delModalBtn").hide();
+                    $("#modalBtn").hide();
+
+                }
 
             });
 
@@ -221,6 +237,7 @@
                 replyTextObj.val("");
                 replyerObj.val("");
             }
+
             // 댓글 추가/수정 버튼 클릭 처리
             $("#modalBtn").click(function(){
 
@@ -236,8 +253,6 @@
                         csrf:csrf //csrf 객체를 같이 전송
                     };
 
-                    //console.log(obj);
-
                     replyManager.add(obj, function(list){
                         alert("새로운 댓글이 추가되었습니다. ")
                         afterAll(list);
@@ -245,7 +260,12 @@
 
                 }else if(mode='MOD'){ // 수정일 때
 
-                    var obj = {replyText:replyText, bno:bno, rno:rno};
+                    var obj = {
+                        replyText:replyText,
+                        bno:bno,
+                        rno:rno,
+                        csrf:csrf //csrf 객체를 같이 전송
+                    };
 
                     replyManager.update(obj, function(list){
 
