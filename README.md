@@ -194,3 +194,7 @@ Thymeleaf의 th:action을 처리하기 위해서는 반드시 CRSF 값을 생성
 ### 인터셉터 추가
 인터셉터는 컨트롤러의 호출을 사전 혹은 사후에 가로챌 수 있고, 컨트롤러가 HttpServletRequest나 HttpServletResponse를  
 이용하지 않는 데 비해 인터셉터는 서블릿 관련 자원들을 그대로 활용할 수 있다는 장점이 있음
+
+### 인터셉터 설정
+스프링 부터 프로젝트에 MVC 관련된 설정을 하기 위해서는 WebMvcConfigurerAdapter라는 추상 클래스를 이용했었음  
+하지만 스프링 부터 1.4이후에 deprecated 되었기 때문에 과거와는 조금 다른 방식으로 구현하게 됨
