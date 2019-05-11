@@ -8,6 +8,7 @@ import me.freelife.vo.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,12 +48,18 @@ public class WebBoardController {
         repo.findById(bno).ifPresent(board -> model.addAttribute("vo", board));
     }
 
+    /*
+    * 로그인한 사용자만 가능하도록 처리
+    * 시큐리티를 이용하는 경우 CSRF 파라미터가 반드시 필요
+    **/
+    @Secured(value={"ROLE_BASIC","ROLE_MANAGER","ROLE_ADMIN"})
     @GetMapping("/modify")
     public void modify(Long bno, @ModelAttribute("pageVO") PageVO vo, Model model){
         log.info("MODIFY BNO: "+ bno);
         repo.findById(bno).ifPresent(board -> model.addAttribute("vo", board));
     }
 
+    @Secured(value={"ROLE_BASIC","ROLE_MANAGER","ROLE_ADMIN"})
     @PostMapping("/modify")
     public String modifyPost(WebBoard board, PageVO vo, RedirectAttributes rttr ){
 
@@ -78,6 +85,7 @@ public class WebBoardController {
         return "redirect:/boards/view";
     }
 
+    @Secured(value={"ROLE_BASIC","ROLE_MANAGER","ROLE_ADMIN"})
     @PostMapping("/delete")
     public String delete(Long bno, PageVO vo, RedirectAttributes rttr ){
 
