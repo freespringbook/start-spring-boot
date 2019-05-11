@@ -205,3 +205,10 @@ AuthenticationSuccessHandler 인터페이스를 구현하면 로그인 처리 �
 
 #### SecurityConfig의 설정 변경
 '/login' 처리 후에는 작성한 LoginSuccessHandler를 이용하도록 설정을 변경
+
+#### view.html의 수정
+view.html에서는 댓글을 추가하기 위해서 로그인으로 이동하는 경우, 로그인 후에 다시 현재 페이지를 보도록 지정해야 함
+
+로그인이 처리 되어야 하는 상황이라면 '/login?dest=로그인 후 이동 경로'를 URL로 처리함
+
+이전 동장 박싱과 비교해 보면 로그인 이후에 다시 게시물의 조회 페이지로 이동하는 것을 볼 수 있음
