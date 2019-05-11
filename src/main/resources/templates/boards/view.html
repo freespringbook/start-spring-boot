@@ -1,4 +1,5 @@
 <html xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{/layout/layout1}">
 
@@ -36,22 +37,32 @@
                 readonly="readonly" />
         </div>
 
-        <div class="float-right">
-            <!-- 수정/삭제 화면으로 이동 -->
-            <a th:href="@{ modify(page=${pageVO.page},
-                            size=${pageVO.size},
-                            type=${pageVO.type},
-                            keyword=${pageVO.keyword},
-                            bno =${vo.bno}
-                         )}" class="btn btn-primary">Modify/Delete</a>
+        <!--  로그인하지 않은 사용자와 로그인한 사용자 같이 처리 하기 위한 처리
+            anonymousUser : 익명의 사용자 인지
+            ${#authentication.principal.member.uid} : 로그인한 사용자 인지 확인
+            uid 변수 지정
+        -->
+        <div class="float-right"
+             th:with="uid =${#authentication.principal} eq 'anonymousUser'? null :${#authentication.principal.member.uid} ">
+
+            <!-- 수정/삭제 화면으로 이동
+                th:if로 버튼이 보이도록 처리
+            -->
+            <a th:if="${uid} eq ${vo.writer}"
+                th:href="@{ modify(page=${pageVO.page},
+                        size=${pageVO.size},
+                        type=${pageVO.type},
+                        keyword=${pageVO.keyword},
+                        bno =${vo.bno}
+                     )}" class="btn btn-primary" id='goModBtn'>Modify/Delete</a>
 
             <!-- 목록으로 이동 -->
             <a th:href="@{ list(page=${pageVO.page},
-                            size=${pageVO.size},
-                            type=${pageVO.type},
-                            keyword=${pageVO.keyword},
-                            bno = ${vo.bno}
-                         )}" class="btn btn-secondary">Go List</a>
+                        size=${pageVO.size},
+                        type=${pageVO.type},
+                        keyword=${pageVO.keyword},
+                        bno = ${vo.bno}
+                     )}" class="btn btn-secondary">Go List</a>
         </div>
 
     </div>
