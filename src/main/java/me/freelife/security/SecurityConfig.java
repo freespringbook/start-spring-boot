@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //로그인 페이지
         http.formLogin()
-                .loginPage("/login");
+                .loginPage("/login").successHandler(new LoginSuccessHandler()); // 작성한 successHandler 추가
 
         //접근 권한 없음 페이지 처리
         http.exceptionHandling().accessDeniedPage("/accessDenied");

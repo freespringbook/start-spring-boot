@@ -202,3 +202,6 @@ Thymeleaf의 th:action을 처리하기 위해서는 반드시 CRSF 값을 생성
 ### AuthenticationSuccessHandler 추가
 시큐리티 로그인 처리후 이동을 제어  
 AuthenticationSuccessHandler 인터페이스를 구현하면 로그인 처리 후 원하는 동작을 제어할 수 있음
+
+#### SecurityConfig의 설정 변경
+'/login' 처리 후에는 작성한 LoginSuccessHandler를 이용하도록 설정을 변경
