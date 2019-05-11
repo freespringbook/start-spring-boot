@@ -8,10 +8,11 @@
     <div class="card-header">Modify Page</div>
     <div class="card-body">
 
-        <form id='f1'>
-
+        <form id='f1' th:action="@{/}">
+            <!--
             <input type="hidden" th:name="${_csrf.parameterName}"
                 th:value="${_csrf.token}"/>
+            -->
 
             <div class="form-group">
                 <label>BNO</label> <input class="form-control" name="bno"

@@ -141,3 +141,15 @@ CSRF 토큰 값이 반드시 필요
 <form action="register" method="post"><input type="hidden" name="_csrf" value="10a0f3b7-cd1d-44fc-adc8-91a05ae9fba1">
 <input type="hidden" name="_csrf" value="10a0f3b7-cd1d-44fc-adc8-91a05ae9fba1">
 ```
+
+## 3. 게시물 조회
+- 현재 게시물의 작성자만이 수정/삭제가 가능하도록 제어
+- 게시물의 댓글 처리 시에 대한 제어
+
+### 게시물 수정/삭제 버튼의 제어
+1. 화면상에서 버튼 자체를 안 보이도록 처리하는 방식
+2. 버튼은 보이고, JavaScript를 이용해서 로그인을 유도하는 방식이 일반적
+
+## 4. 게시물의 수정/삭제
+게시물 수정/삭제가 로그인한 사용자들만 가능하도록  
+SecurityConfig에 추가 하거나 WebBoardController에 @Secure를 이용해서 처리
