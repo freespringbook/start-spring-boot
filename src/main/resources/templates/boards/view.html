@@ -42,14 +42,12 @@
             ${#authentication.principal.member.uid} : 로그인한 사용자 인지 확인
             uid 변수 지정
         -->
-        <div class="float-right"
-             th:with="uid =${#authentication.principal} eq 'anonymousUser'? null :${#authentication.principal.member.uid} ">
+        <div class="float-right">
 
             <!-- 수정/삭제 화면으로 이동
                 th:if로 버튼이 보이도록 처리
             -->
-            <a th:if="${uid} eq ${vo.writer}"
-                th:href="@{ modify(page=${pageVO.page},
+            <a th:href="@{ modify(page=${pageVO.page},
                         size=${pageVO.size},
                         type=${pageVO.type},
                         keyword=${pageVO.keyword},
@@ -142,6 +140,28 @@
                 $("#delModalBtn").hide(); //댓글 추가시에는 삭제버튼 숨기기
 
                 mode= "ADD";
+            });
+
+            // 스크립트로 로그인한 사용자에 따라 버튼 제어
+            var uid =[[${#authentication.principal} eq 'anonymousUser'? null :${#authentication.principal.member.uid}]] ;
+            // 게시글 수정/삭제 버튼 클릭 처리
+            $("#goModBtn").click(function(e){
+
+                e.preventDefault();
+
+                if(uid == null){
+                    if(confirm("로그인 할까요?")){
+                        //self.location = [[@{/login}]];
+                        self.location = $(this).attr("href");
+                    }
+                }else {
+
+                    if(uid == [[${vo.writer}]]){
+                        self.location = $(this).attr('href');
+                    }else {
+                        alert("작성자만이 수정이나 삭제할 수 있습니다.");
+                    }
+                }
             });
 
             var bno = [[${vo.bno}]];
